@@ -56,7 +56,19 @@ func getSysRequirements(dirPath, packageTool string) string {
     if len(text) == 0 {
         log.Fatal("No requirements found")
     }
-    return text
+    return strings.TrimSpace(text)
+}
+
+func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string) string {
+    allReqs := ""
+    for _, dirPath := range dirPaths {
+        if allReqs == "" {
+            allReqs = getSysRequirements(dirPath, packageTool)
+        } else {
+            allReqs += "\n"+getSysRequirements(dirPath, packageTool)
+        }
+    }
+    return allReqs
 }
 
 func getInstalledAptRequirements(withVersion bool) string {
@@ -146,7 +158,13 @@ func main() {
     // parse requirements
     reqs := ""
     if *dirPtr != "" {
-        reqs = getSysRequirements(*dirPtr, packageTool)
+        // check if , in *dirPtr and gather from multiple directories if so
+        if strings.Contains(*dirPtr, ",") {
+            // gather from multiple directories
+            reqs = getSysRequirementsMultipleDirs(strings.Split(*dirPtr, ","), packageTool)
+        } else {
+            reqs = getSysRequirements(*dirPtr, packageTool)
+        }
     } else if *filePtr != "" {
         b, err := ioutil.ReadFile(*filePtr)
         if err != nil {
