@@ -78,8 +78,6 @@ func main() {
             packageTool = "apt"
         } else if isCommandAvailable("dnf") {
             packageTool = "dnf"
-        } else if isCommandAvailable("yum") {
-            packageTool = "yum"
         }
 
     } else if runtime.GOOS == "darwin" {
@@ -107,7 +105,6 @@ func main() {
     } else {
         reqs = getSysRequirements(".", packageTool)
     }
-
     reqs = strings.Replace(reqs, "\n", " ", -1)
     log.Info(reqs)
 
