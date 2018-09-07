@@ -104,7 +104,8 @@ func main() {
     sudo := ""
     autoYes := ""
     linuxTools := []string{
-        "apt", "dnf"
+        "apt",
+        "dnf",
     }
     if runtime.GOOS == "linux" {
         if !*outputPtr {
