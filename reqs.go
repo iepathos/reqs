@@ -71,11 +71,11 @@ func getInstalledAptRequirements() string {
             lSplit := strings.Split(string(line), "/")
             req := lSplit[0]
             version := strings.Split(lSplit[1], " ")[1]
-            newline := req + "=" + version
+            req = req + "=" + version
             if reqs == "" {
-                reqs += newline
+                reqs += req
             } else {
-                reqs += "\n" + newline
+                reqs += "\n" + req
             }
         }
     }
