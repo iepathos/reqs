@@ -201,6 +201,39 @@ func installRequirements(reqs, packageTool, autoYes, sudo string, quiet bool) {
     }
 }
 
+func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string) {
+    // var sudo, autoYes, packageTool string
+    if runtime.GOOS == "linux" {
+        if !useStdout {
+            log.Info("Linux system detected")
+        }
+        linuxTools := []string{
+            "apt",
+            "dnf",
+        }
+        for _, tool := range linuxTools {
+            if isCommandAvailable(tool) {
+                packageTool = tool
+                break
+            }
+        }
+        sudo = "sudo "
+        autoYes = "-y "
+    } else if runtime.GOOS == "darwin" {
+        if !useStdout {
+            log.Info("Darwin system detected")
+        }
+        if !isCommandAvailable("brew") {
+            installHomebrew()
+        }
+        packageTool = "brew"
+    } else if runtime.GOOS == "windows" {
+        log.Fatal("Windows system detected, abandon all hope")
+    }
+
+    return sudo, autoYes, packageTool
+}
+
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
@@ -222,38 +255,10 @@ func main() {
         log.SetLevel(log.ErrorLevel)
     }
 
-    var sudo, autoYes, packageTool string
-    if runtime.GOOS == "linux" {
-        if !*useStdoutPtr {
-            log.Info("Linux system detected")
-        }
-        linuxTools := []string{
-            "apt",
-            "dnf",
-        }
-        for _, tool := range linuxTools {
-            if isCommandAvailable(tool) {
-                packageTool = tool
-                break
-            }
-        }
-        sudo = "sudo "
-        autoYes = "-y "
-    } else if runtime.GOOS == "darwin" {
-        if !*useStdoutPtr {
-            log.Info("Darwin system detected")
-        }
-        if !isCommandAvailable("brew") {
-            installHomebrew()
-        }
-        packageTool = "brew"
-    } else if runtime.GOOS == "windows" {
-        log.Fatal("Windows system detected, abandon all hope")
-    }
+    sudo, autoYes, packageTool := determinePackageTooling(*useStdoutPtr)
 
     reqs := parseRequirements(*dirPtr, *filePtr, packageTool,
-        *useStdoutPtr, *useStdinPtr,
-        *withVersionPtr, *recurse)
+        *useStdoutPtr, *useStdinPtr, *withVersionPtr, *recurse)
 
     if *update {
         if packageTool == "apt" {
