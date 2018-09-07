@@ -136,9 +136,7 @@ func parseRequirements(dirPath, filePath, packageTool string,
                        withVersion, recurse bool) string {
     reqs := ""
     if dirPath != "" {
-        // check if , in *dirPtr and gather from multiple directories if so
         if strings.Contains(dirPath, ",") {
-            // gather from multiple directories
             reqs = getSysRequirementsMultipleDirs(strings.Split(dirPath, ","), packageTool, recurse)
         } else {
             reqs = getSysRequirements(dirPath, packageTool, recurse)
