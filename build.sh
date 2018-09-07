@@ -1,6 +1,6 @@
 #!/bin/bash
 
-go get -u github.com/sirupsen/logrus
+dep ensure
 
 if [[ ! -d "bin" ]]; then
 	mkdir bin
