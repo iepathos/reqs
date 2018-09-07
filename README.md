@@ -24,3 +24,20 @@ get requirements from stdin
 reqs -i < tool-requirements.txt
 ```
 
+
+generate apt requirements from the currently installed apt packages
+```
+reqs -g apt > apt-requirements.txt
+```
+
+
+generate brew requirements from the currently install brew packages
+```
+reqs -g brew > brew-requirements.txt
+```
+
+
+generate dnf requirements from the currently installed dnf packages
+```
+reqs -g dnf > dnf-requirements.txt
+```

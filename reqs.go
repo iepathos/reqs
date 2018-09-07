@@ -9,6 +9,7 @@ import (
     "os/exec"
     "runtime"
     "strings"
+    "fmt"
 )
 
 func isCommandAvailable(name string) bool {
@@ -58,6 +59,36 @@ func getSysRequirements(dirPath, packageTool string) string {
     return text
 }
 
+func getAptRequirements() string {
+    reqs := ""
+    out, err := exec.Command("sudo", "apt", "list", "--installed").Output()
+    if err != nil {
+        log.Fatal(err)
+    }
+    // log.Info(string(out))
+    for _, line := range strings.Split(string(out), "\n") {
+        if strings.Contains(line, "/") {
+            lSplit := strings.Split(string(line), "/")
+            if reqs == "" {
+                reqs += lSplit[0]
+            } else {
+                reqs += "\n"+lSplit[0]
+            }
+        }
+    }
+    return reqs
+}
+
+func getBrewRequirements() string {
+    reqs := ""
+    out, err := exec.Command("brew", "list").Output()
+    if err != nil {
+        log.Fatal(err)
+    }
+    log.Info(out)
+    return reqs
+}
+
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
@@ -65,6 +96,7 @@ func main() {
 
     dirPtr := flag.String("d", "", "directory holding sys-requirements.txt files")
     filePtr := flag.String("f", "", "file to read requirements from")
+    generatePtr := flag.String("g", "", "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
     useStdin := flag.Bool("i", false, "use stdin for requirements")
     flag.Parse()
 
@@ -72,7 +104,9 @@ func main() {
     sudo := ""
     autoYes := ""
     if runtime.GOOS == "linux" {
-        log.Info("Linux system detected")
+        if *generatePtr == "" {
+            log.Info("Linux system detected")
+        }
         if isCommandAvailable("apt") {
             packageTool = "apt"
         } else if isCommandAvailable("dnf") {
@@ -81,7 +115,9 @@ func main() {
         sudo = "sudo "
         autoYes = "-y "
     } else if runtime.GOOS == "darwin" {
-        log.Info("Darwin system detected")
+        if *generatePtr == "" {
+            log.Info("Darwin system detected")
+        }
         if !isCommandAvailable("brew") {
             installHomebrew()
         }
@@ -102,6 +138,15 @@ func main() {
     } else if *useStdin {
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
+    } else if *generatePtr != "" {
+        // stdout requirements
+        if packageTool == "apt" {
+            reqs = getAptRequirements()
+        } else if packageTool == "brew" {
+            reqs = getBrewRequirements()
+        }
+        fmt.Print(reqs)
+        os.Exit(0)
     } else {
         reqs = getSysRequirements(".", packageTool)
     }
