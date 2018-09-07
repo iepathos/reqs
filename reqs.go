@@ -13,6 +13,15 @@ import (
     "path/filepath"
 )
 
+func newLineIfNotEmpty(text, newText string) string {
+    if text == "" {
+        text = newText
+    } else {
+        text += "\n" + newText
+    }
+    return text
+}
+
 func isCommandAvailable(name string) bool {
     cmd := exec.Command("/bin/sh", "-c", "command -v "+name)
     if err := cmd.Run(); err != nil {
@@ -89,11 +98,7 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) string {
 func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) string {
     allReqs := ""
     for _, dirPath := range dirPaths {
-        if allReqs == "" {
-            allReqs = getSysRequirements(dirPath, packageTool, recurse)
-        } else {
-            allReqs += "\n"+getSysRequirements(dirPath, packageTool, recurse)
-        }
+        allReqs = newLineIfNotEmpty(allReqs, getSysRequirements(dirPath, packageTool, recurse))
     }
     return allReqs
 }
@@ -112,11 +117,7 @@ func getInstalledAptRequirements(withVersion bool) string {
                 version := strings.Split(lSplit[1], " ")[1]
                 req = req + "=" + version
             }
-            if reqs == "" {
-                reqs += req
-            } else {
-                reqs += "\n" + req
-            }
+            reqs = newLineIfNotEmpty(reqs, req)
         }
     }
     return reqs
