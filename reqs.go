@@ -180,10 +180,18 @@ func parseRequirements(dirPath, filePath, packageTool string,
     return reqs
 }
 
-func installRequirements(reqs, packageTool, autoYes, sudo string, quiet bool) {
+func installRequirements(reqs, packageTool, autoYes, sudo string, quiet, force bool) {
     log.Info("Installing system requirements with " + packageTool)
     log.Info(sudo + packageTool + " install " + autoYes + reqs)
-    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs)
+    forceArg := ""
+    if force {
+        if packageTool == "brew" {
+            forceArg = "--force "
+        } else {
+            forceArg = "-f "
+        }
+    }
+    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+forceArg+autoYes+reqs)
     var out bytes.Buffer
     var stderr bytes.Buffer
     cmd.Stdout = &out
@@ -243,6 +251,7 @@ func main() {
     quiet := flag.Bool("q", false, "silence logging to error level")
     recurse := flag.Bool("r", false, "recurse down directories to find requirements")
     update := flag.Bool("u", false, "update package tool before install")
+    force := flag.Bool("force", false, "force reinstall packages")
     flag.Parse()
 
     if !*quiet {
@@ -260,6 +269,6 @@ func main() {
         updatePackages(packageTool)
     }
 
-    installRequirements(reqs, packageTool, autoYes, sudo, *quiet)
+    installRequirements(reqs, packageTool, autoYes, sudo, *quiet, *force)
 
 }
