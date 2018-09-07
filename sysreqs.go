@@ -2,7 +2,9 @@ package main
 
 import (
     "bufio"
+    "flag"
     log "github.com/sirupsen/logrus"
+    "io/ioutil"
     "os"
     "os/exec"
     "runtime"
@@ -33,11 +35,28 @@ func main() {
     // if arg -f then use the specified file for requirements
     // if no args use stdin
 
-    reader := bufio.NewReader(os.Stdin)
-    text, _ := reader.ReadString('\n')
+    dirPtr := flag.String("d", "", "directory holding sys-requirements.txt files")
+    filePtr := flag.String("f", "", "file to read requirements from")
+    flag.Parse()
+
+    text := ""
+    if *dirPtr != "" {
+        log.Info(*dirPtr)
+    } else if *filePtr != "" {
+        b, err := ioutil.ReadFile(*filePtr)
+        if err != nil {
+            log.Fatal(err)
+        }
+        text = string(b)
+    } else {
+        reader := bufio.NewReader(os.Stdin)
+        text, _ = reader.ReadString('\n')
+    }
+
     text = strings.Replace(text, "\n", " ", -1)
 
     var packageTool string
+    sudo := ""
     autoYes := ""
     if runtime.GOOS == "linux" {
         log.Info("Linux system detected")
@@ -49,6 +68,7 @@ func main() {
             packageTool = "yum"
         }
         autoYes = "-y "
+        sudo = "sudo "
     } else if runtime.GOOS == "darwin" {
         log.Info("Darwin system detected")
         if !isCommandAvailable("brew") {
@@ -59,7 +79,7 @@ func main() {
         log.Fatal("Windows system detected, abandon all hope")
     }
     log.Info("Installing system requirements with " + packageTool)
-    cmd := exec.Command("/bin/sh", "-c", "brew install "+autoYes+text)
+    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+text)
     err := cmd.Run()
     if err != nil {
         log.Fatal(err)
