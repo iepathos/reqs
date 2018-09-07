@@ -36,7 +36,6 @@ func getSysRequirements(dirPath, packageTool string) string {
         log.Fatal(err)
     }
 
-    // requirementsFiles := []os.FileInfo{}
     // accept packageTool-requirements.txt and common-requirements.txt
     commonRequirements := "common-requirements.txt"
     toolRequirements := packageTool + "-requirements.txt"
