@@ -49,7 +49,7 @@ func getSysRequirements(dirPath, packageTool string) string {
             if err != nil {
                 log.Fatal(err)
             }
-            text += string(b)
+            text += "\n"+string(b)
         }
     }
     if len(text) == 0 {
@@ -78,7 +78,8 @@ func main() {
         } else if isCommandAvailable("dnf") {
             packageTool = "dnf"
         }
-
+        sudo = "sudo "
+        autoYes = "-y "
     } else if runtime.GOOS == "darwin" {
         log.Info("Darwin system detected")
         if !isCommandAvailable("brew") {
@@ -108,6 +109,7 @@ func main() {
     log.Info(reqs)
 
     log.Info("Installing system requirements with " + packageTool)
+    log.Info(sudo+packageTool+" install "+autoYes+reqs)
     cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs)
     err := cmd.Run()
     if err != nil {
