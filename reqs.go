@@ -107,6 +107,8 @@ func main() {
         "apt",
         "dnf",
     }
+
+    // identify operating system and available package management tool
     if runtime.GOOS == "linux" {
         if !*outputPtr {
             log.Info("Linux system detected")
@@ -131,6 +133,7 @@ func main() {
         log.Fatal("Windows system detected, abandon all hope")
     }
 
+    // parse requirements
     reqs := ""
     if *dirPtr != "" {
         reqs = getSysRequirements(*dirPtr, packageTool)
