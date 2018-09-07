@@ -3,13 +3,13 @@ package main
 import (
     "bufio"
     "flag"
+    "fmt"
     log "github.com/sirupsen/logrus"
     "io/ioutil"
     "os"
     "os/exec"
     "runtime"
     "strings"
-    "fmt"
 )
 
 func isCommandAvailable(name string) bool {
@@ -50,7 +50,7 @@ func getSysRequirements(dirPath, packageTool string) string {
             if err != nil {
                 log.Fatal(err)
             }
-            text += "\n"+string(b)
+            text += "\n" + string(b)
         }
     }
     if len(text) == 0 {
@@ -72,7 +72,7 @@ func getAptRequirements() string {
             if reqs == "" {
                 reqs += lSplit[0]
             } else {
-                reqs += "\n"+lSplit[0]
+                reqs += "\n" + lSplit[0]
             }
         }
     }
@@ -80,13 +80,11 @@ func getAptRequirements() string {
 }
 
 func getBrewRequirements() string {
-    reqs := ""
     out, err := exec.Command("brew", "list").Output()
     if err != nil {
         log.Fatal(err)
     }
-    log.Info(out)
-    return reqs
+    return strings.TrimSpace(string(out))
 }
 
 func main() {
@@ -154,7 +152,7 @@ func main() {
     log.Info(reqs)
 
     log.Info("Installing system requirements with " + packageTool)
-    log.Info(sudo+packageTool+" install "+autoYes+reqs)
+    log.Info(sudo + packageTool + " install " + autoYes + reqs)
     cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs)
     err := cmd.Run()
     if err != nil {
