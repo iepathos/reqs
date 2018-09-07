@@ -53,16 +53,20 @@ func getSysRequirements(dirPath, packageTool string) string {
             text += string(b)
         }
     }
+    if len(text) == 0 {
+        log.Fatal("No requirements found")
+    }
     return text
 }
 
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
-    // if no args use stdin
+    // if no args check the current directory
 
     dirPtr := flag.String("d", "", "directory holding sys-requirements.txt files")
     filePtr := flag.String("f", "", "file to read requirements from")
+    useStdin := flag.Bool("i", false, "use stdin for requirements")
     flag.Parse()
 
     var packageTool string
@@ -97,9 +101,11 @@ func main() {
             log.Fatal(err)
         }
         reqs = string(b)
-    } else {
+    } else if *useStdin {
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
+    } else {
+        reqs = getSysRequirements(".", packageTool)
     }
 
     reqs = strings.Replace(reqs, "\n", " ", -1)
