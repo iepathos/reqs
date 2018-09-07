@@ -25,19 +25,21 @@ reqs -i < tool-requirements.txt
 ```
 
 
+reqs automatically determines the tool to used based on what is available
+
 generate apt requirements from the currently installed apt packages
 ```
-reqs -o apt > apt-requirements.txt
+reqs -o > apt-requirements.txt
 ```
 
 
 generate brew requirements from the currently install brew packages
 ```
-reqs -o brew > brew-requirements.txt
+reqs -o > brew-requirements.txt
 ```
 
 
 generate dnf requirements from the currently installed dnf packages
 ```
-reqs -o dnf > dnf-requirements.txt
+reqs -o > dnf-requirements.txt
 ```
