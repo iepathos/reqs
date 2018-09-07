@@ -184,11 +184,12 @@ func parseRequirements(dirPath, filePath, packageTool string,
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
     } else if outputArg {
-        if packageTool == "apt" {
+        switch packageTool {
+        case "apt":
             reqs = getInstalledAptRequirements(withVersion)
-        } else if packageTool == "brew" {
+        case "brew":
             reqs = getInstalledBrewRequirements()
-        } else if packageTool == "dnf" {
+        case "dnf":
             reqs = getInstalledDnfRequirements(withVersion)
         }
         fmt.Print(reqs)
@@ -227,7 +228,8 @@ func installRequirements(reqs, packageTool, autoYes, sudo string, quiet, force b
 }
 
 func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string) {
-    if runtime.GOOS == "linux" {
+    switch runtime.GOOS {
+    case "linux":
         if !useStdout {
             log.Info("Linux system detected")
         }
@@ -244,7 +246,7 @@ func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string)
         }
         sudo = "sudo "
         autoYes = "-y "
-    } else if runtime.GOOS == "darwin" {
+    case "darwin":
         if !useStdout {
             log.Info("Darwin system detected")
         }
@@ -252,8 +254,9 @@ func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string)
             installHomebrew()
         }
         packageTool = "brew"
-    } else if runtime.GOOS == "windows" {
+    case "windows":
         log.Fatal("Windows system detected, abandon all hope")
+        os.Exit(1)
     }
 
     return sudo, autoYes, packageTool
