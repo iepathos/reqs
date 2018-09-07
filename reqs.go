@@ -114,6 +114,7 @@ func main() {
         for _, tool := range linuxTools {
             if isCommandAvailable(tool) {
                 packageTool = tool
+                break
             }
         }
         sudo = "sudo "
