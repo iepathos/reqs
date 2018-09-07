@@ -222,16 +222,14 @@ func main() {
         log.SetLevel(log.ErrorLevel)
     }
 
-    var packageTool string
-    sudo := ""
-    autoYes := ""
-    linuxTools := []string{
-        "apt",
-        "dnf",
-    }
+    var sudo, autoYes, packageTool string
     if runtime.GOOS == "linux" {
         if !*useStdoutPtr {
             log.Info("Linux system detected")
+        }
+        linuxTools := []string{
+            "apt",
+            "dnf",
         }
         for _, tool := range linuxTools {
             if isCommandAvailable(tool) {
