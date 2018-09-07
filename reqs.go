@@ -52,10 +52,10 @@ func runShell(code string) {
 
 func updatePackages(packageTool string) {
     log.Info("Updating " + packageTool + " packages")
-    if packageTool == "apt" {
-        runShell("sudo apt update -y")
-    } else if packageTool == "brew" {
-        runShell("brew update")
+    if packageTool == "brew" {
+        runShell(packageTool + " update")
+    } else {
+        runShell("sudo " + packageTool + " update -y")
     }
 }
 
