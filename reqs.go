@@ -131,6 +131,42 @@ func getInstalledBrewRequirements() string {
     return strings.TrimSpace(string(out))
 }
 
+func parseRequirements(dirPtr, filePtr, packageTool string,
+                       outputPtr, useStdinPtr,
+                       withVersionPtr, quiet, recurse bool) string {
+    reqs := ""
+    if dirPtr != "" {
+        // check if , in *dirPtr and gather from multiple directories if so
+        if strings.Contains(dirPtr, ",") {
+            // gather from multiple directories
+            reqs = getSysRequirementsMultipleDirs(strings.Split(dirPtr, ","), packageTool, recurse)
+        } else {
+            reqs = getSysRequirements(dirPtr, packageTool, recurse)
+        }
+    } else if filePtr != "" {
+        b, err := ioutil.ReadFile(filePtr)
+        if err != nil {
+            log.Fatal(err)
+        }
+        reqs = string(b)
+    } else if useStdinPtr {
+        reader := bufio.NewReader(os.Stdin)
+        reqs, _ = reader.ReadString('\n')
+    } else if outputPtr {
+        if packageTool == "apt" {
+            reqs = getInstalledAptRequirements(withVersionPtr)
+        } else if packageTool == "brew" {
+            reqs = getInstalledBrewRequirements()
+        }
+        fmt.Print(reqs)
+        os.Exit(0)
+    } else {
+        reqs = getSysRequirements(".", packageTool, recurse)
+    }
+    reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
+    return reqs
+}
+
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
@@ -184,37 +220,9 @@ func main() {
         log.Fatal("Windows system detected, abandon all hope")
     }
 
-    // parse requirements
-    reqs := ""
-    if *dirPtr != "" {
-        // check if , in *dirPtr and gather from multiple directories if so
-        if strings.Contains(*dirPtr, ",") {
-            // gather from multiple directories
-            reqs = getSysRequirementsMultipleDirs(strings.Split(*dirPtr, ","), packageTool, *recurse)
-        } else {
-            reqs = getSysRequirements(*dirPtr, packageTool, *recurse)
-        }
-    } else if *filePtr != "" {
-        b, err := ioutil.ReadFile(*filePtr)
-        if err != nil {
-            log.Fatal(err)
-        }
-        reqs = string(b)
-    } else if *useStdinPtr {
-        reader := bufio.NewReader(os.Stdin)
-        reqs, _ = reader.ReadString('\n')
-    } else if *outputPtr {
-        if packageTool == "apt" {
-            reqs = getInstalledAptRequirements(*withVersionPtr)
-        } else if packageTool == "brew" {
-            reqs = getInstalledBrewRequirements()
-        }
-        fmt.Print(reqs)
-        os.Exit(0)
-    } else {
-        reqs = getSysRequirements(".", packageTool, *recurse)
-    }
-    reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
+    reqs := parseRequirements(*dirPtr, *filePtr, packageTool, *outputPtr,
+                              *useStdinPtr, *withVersionPtr,
+                              *quiet, *recurse)
     log.Info(reqs)
 
     log.Info("Installing system requirements with " + packageTool)
