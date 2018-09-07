@@ -220,11 +220,9 @@ func main() {
         log.Fatal("Windows system detected, abandon all hope")
     }
 
-    reqs := parseRequirements(*dirPtr, *filePtr, packageTool, *outputPtr,
-                              *useStdinPtr, *withVersionPtr,
-                              *recurse)
-    log.Info(reqs)
-
+    reqs := parseRequirements(*dirPtr, *filePtr, packageTool,
+                              *outputPtr, *useStdinPtr,
+                              *withVersionPtr, *recurse)
     log.Info("Installing system requirements with " + packageTool)
     log.Info(sudo + packageTool + " install " + autoYes + reqs)
     out, err := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs).Output()
