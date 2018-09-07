@@ -122,8 +122,7 @@ func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recur
     return allReqs
 }
 
-func getInstalledAptRequirements(withVersion bool) string {
-    reqs := ""
+func getInstalledAptRequirements(withVersion bool) (reqs string) {
     out, err := exec.Command("sudo", "apt", "list", "--installed").Output()
     if err != nil {
         log.Fatal(err)
@@ -151,8 +150,7 @@ func getInstalledBrewRequirements() string {
 }
 
 func parseRequirements(dirPath, filePath, packageTool string,
-    outputArg, useStdin, withVersion, recurse bool) string {
-    reqs := ""
+    outputArg, useStdin, withVersion, recurse bool) (reqs string) {
     if dirPath != "" {
         if strings.Contains(dirPath, ",") {
             reqs = getSysRequirementsMultipleDirs(strings.Split(dirPath, ","), packageTool, recurse)
@@ -209,6 +207,7 @@ func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string)
         linuxTools := []string{
             "apt",
             "dnf",
+            "yum",
         }
         for _, tool := range linuxTools {
             if isCommandAvailable(tool) {
