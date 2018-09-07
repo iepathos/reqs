@@ -101,7 +101,14 @@ func main() {
     outputPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
     useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
+    quiet := flag.Bool("q", false, "silence logging")
     flag.Parse()
+
+    if !*quiet {
+        log.SetLevel(log.DebugLevel)
+    } else {
+        log.SetLevel(log.WarnLevel)
+    }
 
     var packageTool string
     sudo := ""
@@ -165,8 +172,10 @@ func main() {
 
     log.Info("Installing system requirements with " + packageTool)
     log.Info(sudo + packageTool + " install " + autoYes + reqs)
-    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs)
-    err := cmd.Run()
+    out, err := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs).Output()
+    if !*quiet {
+        fmt.Print(string(out))
+    }
     if err != nil {
         log.Fatal(err)
     }
