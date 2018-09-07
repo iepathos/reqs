@@ -136,8 +136,8 @@ func main() {
     // if arg -f then use the specified file for requirements
     // if no args check the current directory
 
-    dirPtr := flag.String("d", "", "directory holding sys-requirements.txt files")
-    filePtr := flag.String("f", "", "file to read requirements from")
+    dirPtr := flag.String("d", "", "directory or comma separated directories with requirements files")
+    filePtr := flag.String("f", "", "requirements file to use")
     outputPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
     useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
