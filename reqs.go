@@ -165,6 +165,18 @@ func parseRequirements(dirPath, filePath, packageTool string,
     return reqs
 }
 
+func installRequirements(reqs, packageTool, autoYes, sudo string, quiet bool) {
+    log.Info("Installing system requirements with " + packageTool)
+    log.Info(sudo + packageTool + " install " + autoYes + reqs)
+    out, err := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs).Output()
+    if !quiet {
+        fmt.Print(string(out))
+    }
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
@@ -221,13 +233,7 @@ func main() {
     reqs := parseRequirements(*dirPtr, *filePtr, packageTool,
                               *outputPtr, *useStdinPtr,
                               *withVersionPtr, *recurse)
-    log.Info("Installing system requirements with " + packageTool)
-    log.Info(sudo + packageTool + " install " + autoYes + reqs)
-    out, err := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs).Output()
-    if !*quiet {
-        fmt.Print(string(out))
-    }
-    if err != nil {
-        log.Fatal(err)
-    }
+
+    installRequirements(reqs, packageTool, autoYes, sudo, *quiet)
+    
 }
