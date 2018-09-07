@@ -2,15 +2,16 @@ package main
 
 import (
     "bufio"
+    "bytes"
     "flag"
     "fmt"
     log "github.com/sirupsen/logrus"
     "io/ioutil"
     "os"
     "os/exec"
+    "path/filepath"
     "runtime"
     "strings"
-    "path/filepath"
 )
 
 func newLineIfNotEmpty(text, newText string) string {
@@ -31,7 +32,7 @@ func isCommandAvailable(name string) bool {
 }
 
 func installHomebrew() {
-    log.Info("Installing Homebrew")
+    log.Info("Installing homebrew")
     cmd := exec.Command("/usr/bin/ruby",
         "-e",
         "\"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"")
@@ -39,6 +40,24 @@ func installHomebrew() {
     if err != nil {
         log.Fatal(err)
     }
+}
+
+func runShell(code string) {
+    cmd := exec.Command("/bin/sh", "-c", code)
+    err := cmd.Run()
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+
+func updateApt() {
+    log.Info("Updating apt")
+    runShell("sudo apt update -y")
+}
+
+func updateBrew() {
+    log.Info("Updating homebrew")
+    runShell("brew update")
 }
 
 func recurseForRequirementsFiles(searchPath string) []string {
@@ -70,7 +89,7 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) string {
             log.Fatal(err)
         }
         for _, f := range files {
-            fileNames = append(fileNames, dirPath + "/" + f.Name())
+            fileNames = append(fileNames, dirPath+"/"+f.Name())
         }
     }
 
@@ -132,8 +151,7 @@ func getInstalledBrewRequirements() string {
 }
 
 func parseRequirements(dirPath, filePath, packageTool string,
-                       outputArg, useStdin,
-                       withVersion, recurse bool) string {
+    outputArg, useStdin, withVersion, recurse bool) string {
     reqs := ""
     if dirPath != "" {
         if strings.Contains(dirPath, ",") {
@@ -159,6 +177,7 @@ func parseRequirements(dirPath, filePath, packageTool string,
         fmt.Print(reqs)
         os.Exit(0)
     } else {
+        // parse the current directory
         reqs = getSysRequirements(".", packageTool, recurse)
     }
     reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
@@ -168,15 +187,19 @@ func parseRequirements(dirPath, filePath, packageTool string,
 func installRequirements(reqs, packageTool, autoYes, sudo string, quiet bool) {
     log.Info("Installing system requirements with " + packageTool)
     log.Info(sudo + packageTool + " install " + autoYes + reqs)
-    out, err := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs).Output()
+    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs)
+    var out bytes.Buffer
+    var stderr bytes.Buffer
+    cmd.Stdout = &out
+    cmd.Stderr = &stderr
+    err := cmd.Run()
     if !quiet {
-        fmt.Print(string(out))
+        fmt.Print(string(out.String()))
     }
     if err != nil {
-        log.Fatal(err)
+        log.Fatal(stderr.String())
     }
 }
-
 
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
@@ -190,6 +213,7 @@ func main() {
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
     quiet := flag.Bool("q", false, "silence logging to error level")
     recurse := flag.Bool("r", false, "recurse down directories to find requirements")
+    update := flag.Bool("u", false, "update package tool before install")
     flag.Parse()
 
     if !*quiet {
@@ -230,9 +254,17 @@ func main() {
     }
 
     reqs := parseRequirements(*dirPtr, *filePtr, packageTool,
-                              *outputPtr, *useStdinPtr,
-                              *withVersionPtr, *recurse)
+        *outputPtr, *useStdinPtr,
+        *withVersionPtr, *recurse)
+
+    if *update {
+        if packageTool == "apt" {
+            updateApt()
+        } else if packageTool == "brew" {
+            updateBrew()
+        }
+    }
 
     installRequirements(reqs, packageTool, autoYes, sudo, *quiet)
-    
+
 }
