@@ -147,6 +147,25 @@ func getInstalledBrewRequirements() string {
     return strings.TrimSpace(string(out))
 }
 
+func getInstalledDnfRequirements(withVersion bool) (reqs string) {
+    out, err := exec.Command("sudo", "dnf", "list", "installed").Output()
+    if err != nil {
+        log.Fatal(err)
+    }
+    for _, line := range strings.Split(string(out), "\n") {
+        if strings.Contains(line, "@System") {
+            lSplit := strings.Split(string(line), " ")
+            req := lSplit[0]
+            if withVersion {
+                version := strings.Split(lSplit[1], " ")[0]
+                req = req + "=" + version
+            }
+            reqs = newLineIfNotEmpty(reqs, req)
+        }
+    }
+    return reqs
+}
+
 func parseRequirements(dirPath, filePath, packageTool string,
     outputArg, useStdin, withVersion, recurse bool) (reqs string) {
     if dirPath != "" {
@@ -169,6 +188,8 @@ func parseRequirements(dirPath, filePath, packageTool string,
             reqs = getInstalledAptRequirements(withVersion)
         } else if packageTool == "brew" {
             reqs = getInstalledBrewRequirements()
+        } else if packageTool == "dnf" {
+            reqs = getInstalledDnfRequirements(withVersion)
         }
         fmt.Print(reqs)
         os.Exit(0)
