@@ -131,30 +131,30 @@ func getInstalledBrewRequirements() string {
     return strings.TrimSpace(string(out))
 }
 
-func parseRequirements(dirPtr, filePtr, packageTool string,
-                       outputPtr, useStdinPtr,
-                       withVersionPtr, quiet, recurse bool) string {
+func parseRequirements(dirPath, filePath, packageTool string,
+                       outputArg, useStdin,
+                       withVersion, recurse bool) string {
     reqs := ""
-    if dirPtr != "" {
+    if dirPath != "" {
         // check if , in *dirPtr and gather from multiple directories if so
-        if strings.Contains(dirPtr, ",") {
+        if strings.Contains(dirPath, ",") {
             // gather from multiple directories
-            reqs = getSysRequirementsMultipleDirs(strings.Split(dirPtr, ","), packageTool, recurse)
+            reqs = getSysRequirementsMultipleDirs(strings.Split(dirPath, ","), packageTool, recurse)
         } else {
-            reqs = getSysRequirements(dirPtr, packageTool, recurse)
+            reqs = getSysRequirements(dirPath, packageTool, recurse)
         }
-    } else if filePtr != "" {
-        b, err := ioutil.ReadFile(filePtr)
+    } else if filePath != "" {
+        b, err := ioutil.ReadFile(filePath)
         if err != nil {
             log.Fatal(err)
         }
         reqs = string(b)
-    } else if useStdinPtr {
+    } else if useStdin {
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
-    } else if outputPtr {
+    } else if outputArg {
         if packageTool == "apt" {
-            reqs = getInstalledAptRequirements(withVersionPtr)
+            reqs = getInstalledAptRequirements(withVersion)
         } else if packageTool == "brew" {
             reqs = getInstalledBrewRequirements()
         }
@@ -222,7 +222,7 @@ func main() {
 
     reqs := parseRequirements(*dirPtr, *filePtr, packageTool, *outputPtr,
                               *useStdinPtr, *withVersionPtr,
-                              *quiet, *recurse)
+                              *recurse)
     log.Info(reqs)
 
     log.Info("Installing system requirements with " + packageTool)
