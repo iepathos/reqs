@@ -65,7 +65,6 @@ func getInstalledAptRequirements() string {
     if err != nil {
         log.Fatal(err)
     }
-    // log.Info(string(out))
     for _, line := range strings.Split(string(out), "\n") {
         if strings.Contains(line, "/") {
             lSplit := strings.Split(string(line), "/")
@@ -97,7 +96,7 @@ func main() {
 
     dirPtr := flag.String("d", "", "directory holding sys-requirements.txt files")
     filePtr := flag.String("f", "", "file to read requirements from")
-    outputPtr := flag.String("o", "", "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
+    outputPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
     useStdin := flag.Bool("i", false, "use stdin for requirements")
     flag.Parse()
 
@@ -105,7 +104,7 @@ func main() {
     sudo := ""
     autoYes := ""
     if runtime.GOOS == "linux" {
-        if *outputPtr == "" {
+        if !*outputPtr {
             log.Info("Linux system detected")
         }
         if isCommandAvailable("apt") {
@@ -116,7 +115,7 @@ func main() {
         sudo = "sudo "
         autoYes = "-y "
     } else if runtime.GOOS == "darwin" {
-        if *outputPtr == "" {
+        if !*outputPtr {
             log.Info("Darwin system detected")
         }
         if !isCommandAvailable("brew") {
@@ -139,7 +138,7 @@ func main() {
     } else if *useStdin {
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
-    } else if *outputPtr != "" {
+    } else if *outputPtr {
         // stdout requirements
         if packageTool == "apt" {
             reqs = getInstalledAptRequirements()
