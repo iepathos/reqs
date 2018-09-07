@@ -240,8 +240,8 @@ func main() {
     // if no args check the current directory
 
     dirPtr := flag.String("d", "", "directory or comma separated directories with requirements files")
-    filePtr := flag.String("f", "", "requirements file to use")
-    useStdoutPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
+    filePtr := flag.String("f", "", "specific requirements file to read from")
+    useStdoutPtr := flag.Bool("o", false, "stdout the currently installed requirements for apt or brew")
     useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
     quiet := flag.Bool("q", false, "silence logging to error level")
