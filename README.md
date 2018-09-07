@@ -33,13 +33,19 @@ reqs -o > apt-requirements.txt
 ```
 
 
+generate apt requirements with the specific versions installed
+```
+reqs -o -v > apt-requirements.txt
+```
+
 generate brew requirements from the currently install brew packages
 ```
 reqs -o > brew-requirements.txt
 ```
 
 
-generate dnf requirements from the currently installed dnf packages
-```
-reqs -o > dnf-requirements.txt
-```
+
+TODO:
+
++ track specific verison installed for brew output, make sure it's compatible with install
++ add dnf compatibility for fedora setups

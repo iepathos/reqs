@@ -59,7 +59,7 @@ func getSysRequirements(dirPath, packageTool string) string {
     return text
 }
 
-func getInstalledAptRequirements() string {
+func getInstalledAptRequirements(withVersion bool) string {
     reqs := ""
     out, err := exec.Command("sudo", "apt", "list", "--installed").Output()
     if err != nil {
@@ -69,8 +69,10 @@ func getInstalledAptRequirements() string {
         if strings.Contains(line, "/") {
             lSplit := strings.Split(string(line), "/")
             req := lSplit[0]
-            version := strings.Split(lSplit[1], " ")[1]
-            req = req + "=" + version
+            if withVersion {
+                version := strings.Split(lSplit[1], " ")[1]
+                req = req + "=" + version
+            }
             if reqs == "" {
                 reqs += req
             } else {
@@ -97,7 +99,8 @@ func main() {
     dirPtr := flag.String("d", "", "directory holding sys-requirements.txt files")
     filePtr := flag.String("f", "", "file to read requirements from")
     outputPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
-    useStdin := flag.Bool("i", false, "use stdin for requirements")
+    useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
+    withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
     flag.Parse()
 
     var packageTool string
@@ -143,12 +146,12 @@ func main() {
             log.Fatal(err)
         }
         reqs = string(b)
-    } else if *useStdin {
+    } else if *useStdinPtr {
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
     } else if *outputPtr {
         if packageTool == "apt" {
-            reqs = getInstalledAptRequirements()
+            reqs = getInstalledAptRequirements(*withVersionPtr)
         } else if packageTool == "brew" {
             reqs = getInstalledBrewRequirements()
         }
