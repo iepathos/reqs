@@ -30,6 +30,32 @@ func installHomebrew() {
     }
 }
 
+func getSysRequirements(dirPath, packageTool string) string {
+    files, err := ioutil.ReadDir(dirPath)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // requirementsFiles := []os.FileInfo{}
+    // accept packageTool-requirements.txt and common-requirements.txt
+    commonRequirements := "common-requirements.txt"
+    toolRequirements := packageTool + "-requirements.txt"
+
+    text := ""
+    for _, f := range files {
+        if f.Name() == commonRequirements || f.Name() == toolRequirements {
+            fpath := dirPath + "/" + f.Name()
+            log.Info("Found " + fpath)
+            b, err := ioutil.ReadFile(fpath)
+            if err != nil {
+                log.Fatal(err)
+            }
+            text += string(b)
+        }
+    }
+    return text
+}
+
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
@@ -38,22 +64,6 @@ func main() {
     dirPtr := flag.String("d", "", "directory holding sys-requirements.txt files")
     filePtr := flag.String("f", "", "file to read requirements from")
     flag.Parse()
-
-    text := ""
-    if *dirPtr != "" {
-        log.Info(*dirPtr)
-    } else if *filePtr != "" {
-        b, err := ioutil.ReadFile(*filePtr)
-        if err != nil {
-            log.Fatal(err)
-        }
-        text = string(b)
-    } else {
-        reader := bufio.NewReader(os.Stdin)
-        text, _ = reader.ReadString('\n')
-    }
-
-    text = strings.Replace(text, "\n", " ", -1)
 
     var packageTool string
     sudo := ""
@@ -67,8 +77,7 @@ func main() {
         } else if isCommandAvailable("yum") {
             packageTool = "yum"
         }
-        autoYes = "-y "
-        sudo = "sudo "
+
     } else if runtime.GOOS == "darwin" {
         log.Info("Darwin system detected")
         if !isCommandAvailable("brew") {
@@ -78,8 +87,26 @@ func main() {
     } else if runtime.GOOS == "windows" {
         log.Fatal("Windows system detected, abandon all hope")
     }
+
+    reqs := ""
+    if *dirPtr != "" {
+        reqs = getSysRequirements(*dirPtr, packageTool)
+    } else if *filePtr != "" {
+        b, err := ioutil.ReadFile(*filePtr)
+        if err != nil {
+            log.Fatal(err)
+        }
+        reqs = string(b)
+    } else {
+        reader := bufio.NewReader(os.Stdin)
+        reqs, _ = reader.ReadString('\n')
+    }
+
+    reqs = strings.Replace(reqs, "\n", " ", -1)
+    log.Info(reqs)
+
     log.Info("Installing system requirements with " + packageTool)
-    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+text)
+    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+autoYes+reqs)
     err := cmd.Run()
     if err != nil {
         log.Fatal(err)
