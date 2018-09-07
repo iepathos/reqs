@@ -153,7 +153,7 @@ func main() {
     } else {
         reqs = getSysRequirements(".", packageTool)
     }
-    reqs = strings.Replace(reqs, "\n", " ", -1)
+    reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
     log.Info(reqs)
 
     log.Info("Installing system requirements with " + packageTool)
