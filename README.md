@@ -66,6 +66,11 @@ update package tool before installing requirements.
 reqs -u
 ```
 
+quiet mode squelch everything but errors
+```
+reqs -q
+```
+
 TODO:
 
 + track specific verison installed for brew output, make sure it's compatible with install
