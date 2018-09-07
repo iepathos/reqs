@@ -114,12 +114,11 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) string {
     return strings.TrimSpace(text)
 }
 
-func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) string {
-    allReqs := ""
+func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) (reqs string) {
     for _, dirPath := range dirPaths {
-        allReqs = newLineIfNotEmpty(allReqs, getSysRequirements(dirPath, packageTool, recurse))
+        reqs = newLineIfNotEmpty(reqs, getSysRequirements(dirPath, packageTool, recurse))
     }
-    return allReqs
+    return reqs
 }
 
 func getInstalledAptRequirements(withVersion bool) (reqs string) {
