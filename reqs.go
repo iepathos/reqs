@@ -208,7 +208,7 @@ func main() {
 
     dirPtr := flag.String("d", "", "directory or comma separated directories with requirements files")
     filePtr := flag.String("f", "", "requirements file to use")
-    outputPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
+    useStdoutPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
     useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
     quiet := flag.Bool("q", false, "silence logging to error level")
@@ -230,7 +230,7 @@ func main() {
         "dnf",
     }
     if runtime.GOOS == "linux" {
-        if !*outputPtr {
+        if !*useStdoutPtr {
             log.Info("Linux system detected")
         }
         for _, tool := range linuxTools {
@@ -242,7 +242,7 @@ func main() {
         sudo = "sudo "
         autoYes = "-y "
     } else if runtime.GOOS == "darwin" {
-        if !*outputPtr {
+        if !*useStdoutPtr {
             log.Info("Darwin system detected")
         }
         if !isCommandAvailable("brew") {
@@ -254,7 +254,7 @@ func main() {
     }
 
     reqs := parseRequirements(*dirPtr, *filePtr, packageTool,
-        *outputPtr, *useStdinPtr,
+        *useStdoutPtr, *useStdinPtr,
         *withVersionPtr, *recurse)
 
     if *update {
