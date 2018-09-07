@@ -202,7 +202,6 @@ func installRequirements(reqs, packageTool, autoYes, sudo string, quiet bool) {
 }
 
 func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string) {
-    // var sudo, autoYes, packageTool string
     if runtime.GOOS == "linux" {
         if !useStdout {
             log.Info("Linux system detected")
