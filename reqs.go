@@ -103,14 +103,17 @@ func main() {
     var packageTool string
     sudo := ""
     autoYes := ""
+    linuxTools := []string{
+        "apt", "dnf"
+    }
     if runtime.GOOS == "linux" {
         if !*outputPtr {
             log.Info("Linux system detected")
         }
-        if isCommandAvailable("apt") {
-            packageTool = "apt"
-        } else if isCommandAvailable("dnf") {
-            packageTool = "dnf"
+        for _, tool := range linuxTools {
+            if isCommandAvailable(tool) {
+                packageTool = tool
+            }
         }
         sudo = "sudo "
         autoYes = "-y "
@@ -139,7 +142,6 @@ func main() {
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
     } else if *outputPtr {
-        // stdout requirements
         if packageTool == "apt" {
             reqs = getInstalledAptRequirements()
         } else if packageTool == "brew" {
