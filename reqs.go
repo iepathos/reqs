@@ -10,6 +10,7 @@ import (
     "os/exec"
     "runtime"
     "strings"
+    "path/filepath"
 )
 
 func isCommandAvailable(name string) bool {
@@ -31,10 +32,37 @@ func installHomebrew() {
     }
 }
 
-func getSysRequirements(dirPath, packageTool string) string {
-    files, err := ioutil.ReadDir(dirPath)
+func recurseForRequirementsFiles(searchPath string) []string {
+    filepathList := []string{}
+    err := filepath.Walk(searchPath, func(path string, f os.FileInfo, err error) error {
+        filepathList = append(filepathList, path)
+        return nil
+    })
     if err != nil {
         log.Fatal(err)
+    }
+
+    requirementsFilePaths := []string{}
+    for _, path := range filepathList {
+        if strings.Contains(path, "-requirements.txt") {
+            requirementsFilePaths = append(requirementsFilePaths, path)
+        }
+    }
+    return requirementsFilePaths
+}
+
+func getSysRequirements(dirPath, packageTool string, recurse bool) string {
+    fileNames := []string{}
+    if recurse {
+        fileNames = recurseForRequirementsFiles(dirPath)
+    } else {
+        files, err := ioutil.ReadDir(dirPath)
+        if err != nil {
+            log.Fatal(err)
+        }
+        for _, f := range files {
+            fileNames = append(fileNames, dirPath + "/" + f.Name())
+        }
     }
 
     // accept packageTool-requirements.txt and common-requirements.txt
@@ -42,11 +70,10 @@ func getSysRequirements(dirPath, packageTool string) string {
     toolRequirements := packageTool + "-requirements.txt"
 
     text := ""
-    for _, f := range files {
-        if f.Name() == commonRequirements || f.Name() == toolRequirements {
-            fpath := dirPath + "/" + f.Name()
-            log.Info("Found " + fpath)
-            b, err := ioutil.ReadFile(fpath)
+    for _, fname := range fileNames {
+        if strings.Contains(fname, commonRequirements) || strings.Contains(fname, toolRequirements) {
+            log.Info("Found " + fname)
+            b, err := ioutil.ReadFile(fname)
             if err != nil {
                 log.Fatal(err)
             }
@@ -59,13 +86,13 @@ func getSysRequirements(dirPath, packageTool string) string {
     return strings.TrimSpace(text)
 }
 
-func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string) string {
+func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) string {
     allReqs := ""
     for _, dirPath := range dirPaths {
         if allReqs == "" {
-            allReqs = getSysRequirements(dirPath, packageTool)
+            allReqs = getSysRequirements(dirPath, packageTool, recurse)
         } else {
-            allReqs += "\n"+getSysRequirements(dirPath, packageTool)
+            allReqs += "\n"+getSysRequirements(dirPath, packageTool, recurse)
         }
     }
     return allReqs
@@ -113,13 +140,14 @@ func main() {
     outputPtr := flag.Bool("o", false, "stdout the currently installed requirements for a specified tool apt, dnf, or brew")
     useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
-    quiet := flag.Bool("q", false, "silence logging")
+    quiet := flag.Bool("q", false, "silence logging to error level")
+    recurse := flag.Bool("r", false, "recurse down directories to find requirements")
     flag.Parse()
 
     if !*quiet {
         log.SetLevel(log.DebugLevel)
     } else {
-        log.SetLevel(log.WarnLevel)
+        log.SetLevel(log.ErrorLevel)
     }
 
     var packageTool string
@@ -161,9 +189,9 @@ func main() {
         // check if , in *dirPtr and gather from multiple directories if so
         if strings.Contains(*dirPtr, ",") {
             // gather from multiple directories
-            reqs = getSysRequirementsMultipleDirs(strings.Split(*dirPtr, ","), packageTool)
+            reqs = getSysRequirementsMultipleDirs(strings.Split(*dirPtr, ","), packageTool, *recurse)
         } else {
-            reqs = getSysRequirements(*dirPtr, packageTool)
+            reqs = getSysRequirements(*dirPtr, packageTool, *recurse)
         }
     } else if *filePtr != "" {
         b, err := ioutil.ReadFile(*filePtr)
@@ -183,7 +211,7 @@ func main() {
         fmt.Print(reqs)
         os.Exit(0)
     } else {
-        reqs = getSysRequirements(".", packageTool)
+        reqs = getSysRequirements(".", packageTool, *recurse)
     }
     reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
     log.Info(reqs)
