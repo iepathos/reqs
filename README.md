@@ -71,6 +71,11 @@ quiet mode squelch everything but errors
 reqs -q
 ```
 
+force reinstall of packages
+```
+reqs -force
+```
+
 TODO:
 
 + track specific verison installed for brew output, make sure it's compatible with install

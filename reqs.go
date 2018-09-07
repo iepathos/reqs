@@ -270,5 +270,4 @@ func main() {
     }
 
     installRequirements(reqs, packageTool, autoYes, sudo, *quiet, *force)
-
 }
