@@ -248,13 +248,13 @@ func main() {
     useStdoutPtr := flag.Bool("o", false, "stdout the currently installed requirements for apt or brew")
     useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
-    quiet := flag.Bool("q", false, "silence logging to error level")
-    recurse := flag.Bool("r", false, "recurse down directories to find requirements")
-    update := flag.Bool("u", false, "update package tool before install")
-    force := flag.Bool("force", false, "force reinstall packages")
+    quietPtr := flag.Bool("q", false, "silence logging to error level")
+    recursePtr := flag.Bool("r", false, "recurse down directories to find requirements")
+    updatePtr := flag.Bool("u", false, "update package tool before install")
+    forcePtr := flag.Bool("force", false, "force reinstall packages")
     flag.Parse()
 
-    if !*quiet {
+    if !*quietPtr {
         log.SetLevel(log.DebugLevel)
     } else {
         log.SetLevel(log.ErrorLevel)
@@ -263,11 +263,11 @@ func main() {
     sudo, autoYes, packageTool := determinePackageTooling(*useStdoutPtr)
 
     reqs := parseRequirements(*dirPtr, *filePtr, packageTool,
-        *useStdoutPtr, *useStdinPtr, *withVersionPtr, *recurse)
+        *useStdoutPtr, *useStdinPtr, *withVersionPtr, *recursePtr)
 
-    if *update {
+    if *updatePtr {
         updatePackages(packageTool)
     }
 
-    installRequirements(reqs, packageTool, autoYes, sudo, *quiet, *force)
+    installRequirements(reqs, packageTool, autoYes, sudo, *quietPtr, *forcePtr)
 }
