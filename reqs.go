@@ -50,14 +50,13 @@ func runShell(code string) {
     }
 }
 
-func updateApt() {
-    log.Info("Updating apt")
-    runShell("sudo apt update -y")
-}
-
-func updateBrew() {
-    log.Info("Updating homebrew")
-    runShell("brew update")
+func updatePackages(packageTool string) {
+    log.Info("Updating " + packageTool + " packages")
+    if packageTool == "apt" {
+        runShell("sudo apt update -y")
+    } else if packageTool == "brew" {
+        runShell("brew update")
+    }
 }
 
 func recurseForRequirementsFiles(searchPath string) []string {
@@ -258,11 +257,7 @@ func main() {
         *useStdoutPtr, *useStdinPtr, *withVersionPtr, *recurse)
 
     if *update {
-        if packageTool == "apt" {
-            updateApt()
-        } else if packageTool == "brew" {
-            updateBrew()
-        }
+        updatePackages(packageTool)
     }
 
     installRequirements(reqs, packageTool, autoYes, sudo, *quiet)
