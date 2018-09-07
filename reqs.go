@@ -14,6 +14,12 @@ import (
     "strings"
 )
 
+func fatalCheck(err error) {
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+
 func newLineIfNotEmpty(text, newText string) string {
     if text == "" {
         text = newText
@@ -37,17 +43,13 @@ func installHomebrew() {
         "-e",
         "\"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"")
     err := cmd.Run()
-    if err != nil {
-        log.Fatal(err)
-    }
+    fatalCheck(err)
 }
 
 func runShell(code string) {
     cmd := exec.Command("/bin/sh", "-c", code)
     err := cmd.Run()
-    if err != nil {
-        log.Fatal(err)
-    }
+    fatalCheck(err)
 }
 
 func updatePackages(packageTool string) {
@@ -65,9 +67,7 @@ func recurseForRequirementsFiles(searchPath string) []string {
         filepathList = append(filepathList, path)
         return nil
     })
-    if err != nil {
-        log.Fatal(err)
-    }
+    fatalCheck(err)
 
     requirementsFilePaths := []string{}
     for _, path := range filepathList {
@@ -84,9 +84,7 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) string {
         fileNames = recurseForRequirementsFiles(dirPath)
     } else {
         files, err := ioutil.ReadDir(dirPath)
-        if err != nil {
-            log.Fatal(err)
-        }
+        fatalCheck(err)
         for _, f := range files {
             fileNames = append(fileNames, dirPath+"/"+f.Name())
         }
@@ -101,9 +99,7 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) string {
         if strings.Contains(fname, commonRequirements) || strings.Contains(fname, toolRequirements) {
             log.Info("Found " + fname)
             b, err := ioutil.ReadFile(fname)
-            if err != nil {
-                log.Fatal(err)
-            }
+            fatalCheck(err)
             text += "\n" + string(b)
         }
     }
@@ -122,9 +118,7 @@ func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recur
 
 func getInstalledAptRequirements(withVersion bool) (reqs string) {
     out, err := exec.Command("sudo", "apt", "list", "--installed").Output()
-    if err != nil {
-        log.Fatal(err)
-    }
+    fatalCheck(err)
     for _, line := range strings.Split(string(out), "\n") {
         if strings.Contains(line, "/") {
             lSplit := strings.Split(string(line), "/")
@@ -141,17 +135,13 @@ func getInstalledAptRequirements(withVersion bool) (reqs string) {
 
 func getInstalledBrewRequirements() string {
     out, err := exec.Command("brew", "list").Output()
-    if err != nil {
-        log.Fatal(err)
-    }
+    fatalCheck(err)
     return strings.TrimSpace(string(out))
 }
 
 func getInstalledDnfRequirements(withVersion bool) (reqs string) {
     out, err := exec.Command("sudo", "dnf", "list", "installed").Output()
-    if err != nil {
-        log.Fatal(err)
-    }
+    fatalCheck(err)
     for _, line := range strings.Split(string(out), "\n") {
         if strings.Contains(line, "@System") {
             lSplit := strings.Split(string(line), " ")
@@ -176,9 +166,7 @@ func parseRequirements(dirPath, filePath, packageTool string,
         }
     } else if filePath != "" {
         b, err := ioutil.ReadFile(filePath)
-        if err != nil {
-            log.Fatal(err)
-        }
+        fatalCheck(err)
         reqs = string(b)
     } else if useStdin {
         reader := bufio.NewReader(os.Stdin)
