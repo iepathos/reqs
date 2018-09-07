@@ -4,7 +4,23 @@ Abstract cross-platform package install tool.  Takes a requirements file, like a
 
 Usage:
 
+Automaticaly find and detect tool-requirements.txt in the directory.  common-requirements.txt accepts for cross-platform shared system dependencies.
 ```
-reqs < tool-requirements.txt
+reqs
+```
 
+get requiremetns from a specific directory, automaticaly detect appropriate <system-tool>-requirements.txt to use
 ```
+reqs -d /some/path/
+```
+
+get requirements from a specific file
+```
+reqs -f tool-requirements.txt
+```
+
+get requirements from stdin
+```
+reqs -i < tool-requirements.txt
+```
+
