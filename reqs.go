@@ -177,6 +177,7 @@ func installRequirements(reqs, packageTool, autoYes, sudo string, quiet bool) {
     }
 }
 
+
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
@@ -204,8 +205,6 @@ func main() {
         "apt",
         "dnf",
     }
-
-    // identify operating system and available package management tool
     if runtime.GOOS == "linux" {
         if !*outputPtr {
             log.Info("Linux system detected")
