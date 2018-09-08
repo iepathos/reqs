@@ -1,16 +1,27 @@
 # reqs
 
-Reqs is a cross-platform package management tool.  It looks to make it stupid easy to manage system-level dependencies across Linux and MacOSX systems.  Initial aim is to wrap apt and homebrew so cross deployment to ubuntu and macosx systems can be easily configurable.  After that, I like Fedora so will get dnf compatible and probably yum.
+Reqs is a cross-platform Linux and MacOSX systems package management tool. Initial aim is to wrap apt and homebrew.  After that, aiming for dnf compatiblity for Fedora deployments.
 
-Takes a requirements file, like a pip requirements.txt with package names each on a new line and it tries to install the packages listed in it using either apt, dnf, or brew.
+Best way to use reqs is with a reqs.yml file in you repositories.
+
+reqs.yml
+```
+common:
+  - curl
+  - git
+apt:
+  - golang-go
+brew:
+  - go
+```
+
+Then run `reqs` in your repos and it'll install your system-level dependencies for you.
+
+Can use separate requirements files, like how pip requirements.txt work with package names each on a new line and it tries to install the packages listed in it using either apt-requirements.txt, dnf-requirements.txt, brew-requirements.txt, or common-requirements.txt.
 
 It can gather these requirements for multiple directories and/or recursively and combine them into a single installation call.
 
-reqs automatically determines the tool to used based on what is available.
-
-reqs looks for files named common-requirements.txt (cross-platform same-name deps), apt-requirements.txt, dnf-requirements.txt, brew-requirements.txt and uses these files to figure out what to install.
-
-reqs can generate the requirements for these files based on what is currently available to it on the system.
+reqs automatically determines the tool to used based on the system and what is available.
 
 
 ## Installation
@@ -96,7 +107,7 @@ force reinstall of packages
 reqs -force
 ```
 
-## build
+## Building
 
 Must have Go installed.  Recent version is better.  Relies on go-dep and go-releaser.  Build script will attempt to install/update both and whatever other deps reqs has using dep.
 
@@ -104,7 +115,8 @@ Must have Go installed.  Recent version is better.  Relies on go-dep and go-rele
 ./build.sh
 ```
 
-TODO:
+## Todo
+
 + refactor reqs code until it's beautiful
-+ add dnf compatibility for fedora setups
++ test dnf compatibility for fedora setups
 + add pip, gem, npm, and bower comprehension or just stick to system packages?
