@@ -88,26 +88,38 @@ func getBrewTaps() string {
     return strings.TrimSpace(string(out))
 }
 
-func recurseForRequirementsFiles(searchPath string) []string {
+func stringContainedInSlice(s string, arr []string) bool {
+    for _, v := range arr {
+        if strings.Contains(s, v) {
+            return true
+        }
+    }
+    return false
+}
+
+func recurseForFiles(dir string, fnames []string) (filePaths []string) {
     filepathList := []string{}
-    err := filepath.Walk(searchPath, func(path string, f os.FileInfo, err error) error {
+    err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
         filepathList = append(filepathList, path)
         return nil
     })
     fatalCheck(err)
 
-    requirementsFilePaths := []string{}
     for _, path := range filepathList {
-        if strings.Contains(path, "requirements.txt") || strings.Contains(path, "reqs.yml") {
-            requirementsFilePaths = append(requirementsFilePaths, path)
+        if stringContainedInSlice(path, fnames) {
+            filePaths = append(filePaths, path)
         }
     }
-    return requirementsFilePaths
+    return filePaths
 }
 
 func getRequirementFilenames(dirPath string, recurse bool) (fileNames []string) {
+    requirementFilenames := []string{
+        "requirements.txt",
+        "reqs.yml",
+    }
     if recurse {
-        fileNames = recurseForRequirementsFiles(dirPath)
+        fileNames = recurseForFiles(dirPath, requirementFilenames)
     } else {
         files, err := ioutil.ReadDir(dirPath)
         fatalCheck(err)
