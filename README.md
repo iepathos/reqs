@@ -61,9 +61,14 @@ generate brew requirements from the currently install brew packages
 reqs -o > brew-requirements.txt
 ```
 
-update package tool before installing requirements.
+update packages before installing requirements
 ```
 reqs -u
+```
+
+update and upgrade packages before installing requirements
+```
+reqs -up
 ```
 
 quiet mode squelch everything but errors
