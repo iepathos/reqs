@@ -77,7 +77,7 @@ func recurseForRequirementsFiles(searchPath string) []string {
 
     requirementsFilePaths := []string{}
     for _, path := range filepathList {
-        if strings.Contains(path, "-requirements.txt") {
+        if strings.Contains(path, "-requirements.txt") || strings.Contains(path, "reqs.yml") {
             requirementsFilePaths = append(requirementsFilePaths, path)
         }
     }
