@@ -24,6 +24,9 @@ func main() {
     sourcesPtr := flag.Bool("so", false, "stdout package tool sources")
     flag.Parse()
 
+    if *withVersionPtr {
+        *useStdoutPtr = true
+    }
     if *sourcesPtr || *useStdoutPtr {
         log.SetLevel(log.ErrorLevel)
     } else if !*quietPtr {

@@ -212,6 +212,18 @@ type RequirementsParser struct {
 	Sources             bool
 }
 
+func (rp RequirementsParser) ListInstalled(packageTool string) (requirements string) {
+	switch packageTool {
+	case "apt":
+		requirements = getInstalledAptRequirements(rp.WithVersion)
+	case "brew":
+		requirements = getInstalledBrewRequirements()
+	case "dnf":
+		requirements = getInstalledDnfRequirements(rp.WithVersion)
+	}
+	return requirements
+}
+
 // determine the package tool, sudo and autoYes based on the current system
 func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) {
 	switch runtime.GOOS {
@@ -279,14 +291,7 @@ func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
 		reqs, _ = reader.ReadString('\n')
 	} else if rp.UseStdout {
 		// output requirements to stdout
-		switch packageTool {
-		case "apt":
-			reqs = getInstalledAptRequirements(rp.WithVersion)
-		case "brew":
-			reqs = getInstalledBrewRequirements()
-		case "dnf":
-			reqs = getInstalledDnfRequirements(rp.WithVersion)
-		}
+		reqs = rp.ListInstalled(packageTool)
 		fmt.Print(reqs)
 		os.Exit(0)
 	} else {
