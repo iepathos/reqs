@@ -164,7 +164,7 @@ func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recur
 	return reqs
 }
 
-func getInstalledAptRequirements(withVersion bool) (reqs string) {
+func aptListInstalled(withVersion bool) (reqs string) {
 	out, err := exec.Command("sudo", "apt", "list", "--installed").Output()
 	FatalCheck(err)
 	for _, line := range strings.Split(string(out), "\n") {
@@ -181,13 +181,13 @@ func getInstalledAptRequirements(withVersion bool) (reqs string) {
 	return reqs
 }
 
-func getInstalledBrewRequirements() string {
+func brewListInstalled() string {
 	out, err := exec.Command("brew", "list").Output()
 	FatalCheck(err)
 	return strings.TrimSpace(string(out))
 }
 
-func getInstalledDnfRequirements(withVersion bool) (reqs string) {
+func dnfListInstalled(withVersion bool) (reqs string) {
 	out, err := exec.Command("sudo", "dnf", "list", "installed").Output()
 	FatalCheck(err)
 	for _, line := range strings.Split(string(out), "\n") {
@@ -215,11 +215,11 @@ type RequirementsParser struct {
 func (rp RequirementsParser) ListInstalled(packageTool string) (requirements string) {
 	switch packageTool {
 	case "apt":
-		requirements = getInstalledAptRequirements(rp.WithVersion)
+		requirements = aptListInstalled(rp.WithVersion)
 	case "brew":
-		requirements = getInstalledBrewRequirements()
+		requirements = brewListInstalled()
 	case "dnf":
-		requirements = getInstalledDnfRequirements(rp.WithVersion)
+		requirements = dnfListInstalled(rp.WithVersion)
 	}
 	return requirements
 }
