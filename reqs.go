@@ -53,6 +53,13 @@ func runShell(code string) {
     fatalCheck(err)
 }
 
+func getAptSources() (sources string) {
+    b, err := ioutil.ReadFile("/etc/apt/sources.list")
+    fatalCheck(err)
+    sources += "\n" + string(b)
+    return sources
+}
+
 func recurseForRequirementsFiles(searchPath string) []string {
     filepathList := []string{}
     err := filepath.Walk(searchPath, func(path string, f os.FileInfo, err error) error {
@@ -95,7 +102,7 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
         }
     }
     if len(text) == 0 {
-        log.Fatal("No requirements found")
+        log.Fatal("No requirements files found")
     }
     return strings.TrimSpace(text)
 }
@@ -152,6 +159,7 @@ type RequirementsParser struct {
     UseStdout, UseStdin bool
     WithVersion         bool
     Recurse             bool
+    Sources             bool
 }
 
 func (rp RequirementsParser) parseTooling() (sudo, autoYes, packageTool string) {
@@ -192,6 +200,12 @@ func (rp RequirementsParser) parseTooling() (sudo, autoYes, packageTool string) 
 
 func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
     sudo, autoYes, packageTool = rp.parseTooling()
+    if rp.Sources {
+        if packageTool == "apt" {
+            fmt.Print(getAptSources())
+            os.Exit(0)
+        }
+    }
 
     if rp.Dir != "" {
         // search directory for requirements
@@ -301,9 +315,12 @@ func main() {
     updatePtr := flag.Bool("u", false, "update packages before install")
     forcePtr := flag.Bool("force", false, "force reinstall packages")
     upgradePtr := flag.Bool("up", false, "update and upgrade packages before install")
+    sourcesPtr := flag.Bool("so", false, "stdout package tool sources")
     flag.Parse()
 
-    if !*quietPtr {
+    if *sourcesPtr || *useStdoutPtr {
+        log.SetLevel(log.ErrorLevel)
+    } else if !*quietPtr {
         log.SetLevel(log.DebugLevel)
     } else {
         log.SetLevel(log.ErrorLevel)
@@ -316,6 +333,7 @@ func main() {
         UseStdin:    *useStdinPtr,
         WithVersion: *withVersionPtr,
         Recurse:     *recursePtr,
+        Sources:     *sourcesPtr,
     }
 
     sudo, packageTool, autoYes, reqs := rp.Parse()
