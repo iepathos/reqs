@@ -129,7 +129,6 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
             b, err := ioutil.ReadFile(fname)
             fatalCheck(err)
             text = appendNewLinesOnly(text, string(b))
-            // text += "\n" + string(b)
         } else if strings.Contains(fname, reqsYml) {
             log.Info("Found " + fname)
             b, err := ioutil.ReadFile(fname)
@@ -142,7 +141,6 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
                 if tool == "common" || tool == packageTool {
                     // add the list to text
                     for _, p := range packages {
-                        // text += "\n" + string(p)
                         text = appendNewLinesOnly(text, string(p))
                     }
 
