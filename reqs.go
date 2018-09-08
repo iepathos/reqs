@@ -210,9 +210,8 @@ type RequirementsParser struct {
     Sources             bool
 }
 
+// determine the package tool, sudo and autoYes based on the current system
 func (rp RequirementsParser) parseTooling() (sudo, autoYes, packageTool string) {
-    // figure out what package manage tool and args are appropriate
-    // for the current system
     switch runtime.GOOS {
     case "linux":
         if !rp.UseStdout {
@@ -246,6 +245,7 @@ func (rp RequirementsParser) parseTooling() (sudo, autoYes, packageTool string) 
     return sudo, autoYes, packageTool
 }
 
+// determine package tool and args on this system
 func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
     sudo, autoYes, packageTool = rp.parseTooling()
     // output sources for apt, taps for brew
