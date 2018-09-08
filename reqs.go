@@ -122,9 +122,9 @@ func getRequirementFilenames(dirPath string, recurse bool) (fileNames []string) 
 // in the specified directory, can recurse down the directory
 func getSysRequirements(dirPath, packageTool string, recurse bool) (text string) {
     fileNames := getRequirementFilenames(dirPath, recurse)
-    commonRequirements := "common-requirements.txt"
     toolRequirements := packageTool + "-requirements.txt"
-    reqsYml := "reqs.yml"
+    const commonRequirements = "common-requirements.txt"
+    const reqsYml = "reqs.yml"
 
     for _, fname := range fileNames {
         if strings.Contains(fname, commonRequirements) || strings.Contains(fname, toolRequirements) {
