@@ -92,3 +92,4 @@ TODO:
 + refactor reqs code until it's beautiful
 + add dnf compatibility for fedora setups
 + add pip, gem, npm, and bower comprehension or just stick to system packages?
++ read a single reqs.yml with the different requirements under different subsections instead of spread across different text files
