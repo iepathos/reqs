@@ -322,7 +322,7 @@ func main() {
         Force:   *forcePtr,
         Quiet:   *quietPtr,
     }
-    if *updatePtr {
+    if *updatePtr || *upgradePtr {
         pc.Update()
     }
     if *upgradePtr {
