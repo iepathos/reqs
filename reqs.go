@@ -118,6 +118,15 @@ func getRequirementFilenames(dirPath string, recurse bool) (fileNames []string) 
     return fileNames
 }
 
+func ymlToMap(ymlPath string) (conf map[string][]string) {
+    b, err := ioutil.ReadFile(ymlPath)
+    fatalCheck(err)
+    m := make(map[string][]string)
+    err = yaml.Unmarshal(b, &m)
+    fatalCheck(err)
+    return m
+}
+
 // find tool-requirements.txt, common-requirements.txt and/or reqs.yml
 // in the specified directory, can recurse down the directory
 func getSysRequirements(dirPath, packageTool string, recurse bool) (text string) {
@@ -134,19 +143,12 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
             text = appendNewLinesOnly(text, string(b))
         } else if strings.Contains(fname, reqsYml) {
             log.Info("Found " + fname)
-            b, err := ioutil.ReadFile(fname)
-            fatalCheck(err)
-            m := make(map[string][]string)
-            err = yaml.Unmarshal(b, &m)
-            fatalCheck(err)
-
-            for tool, packages := range m {
+            conf := ymlToMap(fname)
+            for tool, packages := range conf {
                 if tool == "common" || tool == packageTool {
-                    // add the list to text
                     for _, p := range packages {
                         text = appendNewLinesOnly(text, string(p))
                     }
-
                 }
             }
         }
