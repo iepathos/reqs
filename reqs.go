@@ -229,9 +229,7 @@ type PackageConfig struct {
     Quiet, Force  bool
 }
 
-func (pc PackageConfig) Install() {
-    log.Info("Installing system requirements with " + pc.Tool)
-    forceArg := ""
+func (pc PackageConfig) getForceArg() (forceArg string) {
     if pc.Force {
         if pc.Tool == "brew" {
             forceArg = "--force "
@@ -239,6 +237,12 @@ func (pc PackageConfig) Install() {
             forceArg = "-f "
         }
     }
+    return forceArg
+}
+
+func (pc PackageConfig) Install() {
+    log.Info("Installing system requirements with " + pc.Tool)
+    forceArg := pc.getForceArg()
     cmdStr := pc.Sudo + pc.Tool + " install " + pc.AutoYes + forceArg + pc.Reqs
     log.Info(cmdStr)
     cmd := exec.Command("/bin/sh", "-c", cmdStr)
@@ -257,14 +261,7 @@ func (pc PackageConfig) Install() {
 
 func (pc PackageConfig) Update() {
     log.Info("Updating " + pc.Tool + " packages")
-    forceArg := ""
-    if pc.Force {
-        if pc.Tool == "brew" {
-            forceArg = "--force "
-        } else {
-            forceArg = "-f "
-        }
-    }
+    forceArg := pc.getForceArg()
     if pc.Tool == "brew" {
         runShell(pc.Tool + " update " + forceArg)
     } else {
