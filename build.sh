@@ -2,18 +2,9 @@
 
 dep ensure
 
-if [[ ! -d "bin" ]]; then
-	mkdir bin
+distarg=""
+if [[ -d "dist" ]]; then
+	distarg="--rm-dist"
 fi
 
-# build for apple macbook
-GOOS=darwin GOARCH=386 go build reqs.go
-mv reqs bin/reqs-darwin-386
-GOOS=darwin GOARCH=amd64 go build reqs.go
-mv reqs bin/reqs-darwin-amd64
-
-# build for linux 
-GOOS=linux GOARCH=386 go build reqs.go
-mv reqs bin/reqs-linux-386
-GOOS=linux GOARCH=amd64 go build reqs.go
-mv reqs bin/reqs-linux-amd64
+goreleaser $distarg
