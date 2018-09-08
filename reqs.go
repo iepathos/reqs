@@ -98,7 +98,7 @@ func recurseForRequirementsFiles(searchPath string) []string {
 
     requirementsFilePaths := []string{}
     for _, path := range filepathList {
-        if strings.Contains(path, "-requirements.txt") || strings.Contains(path, "reqs.yml") {
+        if strings.Contains(path, "requirements.txt") || strings.Contains(path, "reqs.yml") {
             requirementsFilePaths = append(requirementsFilePaths, path)
         }
     }
@@ -331,24 +331,22 @@ func (pc PackageConfig) Install() {
     }
 }
 
-func (pc PackageConfig) Update() {
+func (pc PackageConfig) abstractUp(arg string) {
     log.Info("Updating " + pc.Tool + " packages")
     forceArg := pc.getForceArg()
     if pc.Tool == "brew" {
-        runShell(pc.Tool + " update " + forceArg)
+        runShell(pc.Tool + " " + arg + " " + forceArg)
     } else {
-        runShell("sudo " + pc.Tool + " update " + forceArg + pc.AutoYes)
+        runShell("sudo " + pc.Tool + " " + arg + " " + forceArg + pc.AutoYes)
     }
 }
 
+func (pc PackageConfig) Update() {
+    pc.abstractUp("update")
+}
+
 func (pc PackageConfig) Upgrade() {
-    log.Info("Upgrading " + pc.Tool + " packages")
-    forceArg := pc.getForceArg()
-    if pc.Tool == "brew" {
-        runShell(pc.Tool + " upgrade " + forceArg)
-    } else {
-        runShell("sudo " + pc.Tool + " upgrade " + forceArg + pc.AutoYes)
-    }
+    pc.abstractUp("upgrade")
 }
 
 func main() {
