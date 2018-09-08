@@ -155,6 +155,8 @@ type RequirementsParser struct {
 }
 
 func (rp RequirementsParser) parseTooling() (sudo, autoYes, packageTool string) {
+    // figure out what package manage tool and args are appropriate
+    // for the current system
     switch runtime.GOOS {
     case "linux":
         if !rp.UseStdout {
