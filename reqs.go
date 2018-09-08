@@ -105,6 +105,8 @@ func recurseForRequirementsFiles(searchPath string) []string {
     return requirementsFilePaths
 }
 
+// find tool-requirements.txt, common-requirements.txt and/or reqs.yml
+// in the specified directory, can recurse down the directory
 func getSysRequirements(dirPath, packageTool string, recurse bool) (text string) {
     fileNames := []string{}
     if recurse {
@@ -117,7 +119,6 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
         }
     }
 
-    // accept packageTool-requirements.txt and common-requirements.txt
     commonRequirements := "common-requirements.txt"
     toolRequirements := packageTool + "-requirements.txt"
     reqsYml := "reqs.yml"
