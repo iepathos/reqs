@@ -192,19 +192,23 @@ func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
     sudo, autoYes, packageTool = rp.parseTooling()
 
     if rp.Dir != "" {
+        // search directory for requirements
         if strings.Contains(rp.Dir, ",") {
             reqs = getSysRequirementsMultipleDirs(strings.Split(rp.Dir, ","), packageTool, rp.Recurse)
         } else {
             reqs = getSysRequirements(rp.Dir, packageTool, rp.Recurse)
         }
     } else if rp.File != "" {
+        // read specified file for requirements
         b, err := ioutil.ReadFile(rp.File)
         fatalCheck(err)
         reqs = string(b)
     } else if rp.UseStdin {
+        // read stdin for requirements
         reader := bufio.NewReader(os.Stdin)
         reqs, _ = reader.ReadString('\n')
     } else if rp.UseStdout {
+        // output requirements to stdout
         switch packageTool {
         case "apt":
             reqs = getInstalledAptRequirements(rp.WithVersion)
