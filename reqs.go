@@ -60,6 +60,12 @@ func getAptSources() (sources string) {
     return sources
 }
 
+func getBrewTaps() string {
+    out, err := exec.Command("brew", "tap").Output()
+    fatalCheck(err)
+    return strings.TrimSpace(string(out))
+}
+
 func recurseForRequirementsFiles(searchPath string) []string {
     filepathList := []string{}
     err := filepath.Walk(searchPath, func(path string, f os.FileInfo, err error) error {
@@ -200,11 +206,15 @@ func (rp RequirementsParser) parseTooling() (sudo, autoYes, packageTool string) 
 
 func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
     sudo, autoYes, packageTool = rp.parseTooling()
+    // output sources for apt, taps for brew
     if rp.Sources {
-        if packageTool == "apt" {
+        switch packageTool {
+        case "apt":
             fmt.Print(getAptSources())
-            os.Exit(0)
+        case "brew":
+            fmt.Print(getBrewTaps())
         }
+        os.Exit(0)
     }
 
     if rp.Dir != "" {
