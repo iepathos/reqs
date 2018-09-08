@@ -13,8 +13,6 @@ reqs looks for files named common-requirements.txt (cross-platform same-name dep
 reqs can generate the requirements for these files based on what is currently available to it on the system.
 
 
-Example setup [https://github.com/iepathos/reup](https://github.com/iepathos/reup)
-
 ## Installation
 
 Download the latest release for your system from [https://github.com/iepathos/reqs/releases](https://github.com/iepathos/reqs/releases)
@@ -29,6 +27,8 @@ go get -u github.com/iepathos/reqs
 Automaticaly finds apt-requirements.txt, brew-requirements.txt, dnf-requirements.txt, common-requirements.txt, and reqs.yml files.  common-requirements.txt are accepted for cross-platform shared same-name system dependencies.
 
 For an example reqs.yml see [https://github.com/iepathos/reqs/blob/master/examples/reqs.yml](https://github.com/iepathos/reqs/blob/master/examples/reqs.yml)
+
+Example dev setup [https://github.com/iepathos/reup](https://github.com/iepathos/reup)
 
 View reqs args and their descriptions
 ```
