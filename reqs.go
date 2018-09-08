@@ -47,6 +47,7 @@ func installHomebrew() {
 }
 
 func runShell(code string) {
+    log.Info(code)
     cmd := exec.Command("/bin/sh", "-c", code)
     err := cmd.Run()
     fatalCheck(err)
@@ -269,6 +270,16 @@ func (pc PackageConfig) Update() {
     }
 }
 
+func (pc PackageConfig) Upgrade() {
+    log.Info("Upgrading " + pc.Tool + " packages")
+    forceArg := pc.getForceArg()
+    if pc.Tool == "brew" {
+        runShell(pc.Tool + " upgrade " + forceArg)
+    } else {
+        runShell("sudo " + pc.Tool + " upgrade " + forceArg + pc.AutoYes)
+    }
+}
+
 func main() {
     // if arg -d then check the directory for <sys>-requirements.txt files and use them
     // if arg -f then use the specified file for requirements
@@ -281,8 +292,9 @@ func main() {
     withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
     quietPtr := flag.Bool("q", false, "silence logging to error level")
     recursePtr := flag.Bool("r", false, "recurse down directories to find requirements")
-    updatePtr := flag.Bool("u", false, "update package tool before install")
+    updatePtr := flag.Bool("u", false, "update packages before install")
     forcePtr := flag.Bool("force", false, "force reinstall packages")
+    upgradePtr := flag.Bool("upg", false, "upgade packages before install")
     flag.Parse()
 
     if !*quietPtr {
@@ -312,6 +324,9 @@ func main() {
     }
     if *updatePtr {
         pc.Update()
+    }
+    if *upgradePtr {
+        pc.Upgrade()
     }
     pc.Install()
 }
