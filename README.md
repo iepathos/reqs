@@ -92,6 +92,14 @@ force reinstall of packages
 reqs -force
 ```
 
+## build
+
+Must have Go installed.  Recent version is better.  Relies on go-dep and go-releaser.  Build script will attempt to install/update both and whatever other deps reqs has using dep
+
+```
+./build.sh
+```
+
 TODO:
 + refactor reqs code until it's beautiful
 + add dnf compatibility for fedora setups
