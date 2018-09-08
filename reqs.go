@@ -52,15 +52,6 @@ func runShell(code string) {
     fatalCheck(err)
 }
 
-func updatePackages(packageTool string) {
-    log.Info("Updating " + packageTool + " packages")
-    if packageTool == "brew" {
-        runShell(packageTool + " update")
-    } else {
-        runShell("sudo " + packageTool + " update -y")
-    }
-}
-
 func recurseForRequirementsFiles(searchPath string) []string {
     filepathList := []string{}
     err := filepath.Walk(searchPath, func(path string, f os.FileInfo, err error) error {
@@ -156,75 +147,22 @@ func getInstalledDnfRequirements(withVersion bool) (reqs string) {
     return reqs
 }
 
-func parseRequirements(dirPath, filePath, packageTool string,
-    outputArg, useStdin, withVersion, recurse bool) (reqs string) {
-    if dirPath != "" {
-        if strings.Contains(dirPath, ",") {
-            reqs = getSysRequirementsMultipleDirs(strings.Split(dirPath, ","), packageTool, recurse)
-        } else {
-            reqs = getSysRequirements(dirPath, packageTool, recurse)
-        }
-    } else if filePath != "" {
-        b, err := ioutil.ReadFile(filePath)
-        fatalCheck(err)
-        reqs = string(b)
-    } else if useStdin {
-        reader := bufio.NewReader(os.Stdin)
-        reqs, _ = reader.ReadString('\n')
-    } else if outputArg {
-        switch packageTool {
-        case "apt":
-            reqs = getInstalledAptRequirements(withVersion)
-        case "brew":
-            reqs = getInstalledBrewRequirements()
-        case "dnf":
-            reqs = getInstalledDnfRequirements(withVersion)
-        }
-        fmt.Print(reqs)
-        os.Exit(0)
-    } else {
-        // parse the current directory
-        reqs = getSysRequirements(".", packageTool, recurse)
-    }
-    reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
-    return reqs
+type RequirementsParser struct {
+    Dir, File           string
+    UseStdout, UseStdin bool
+    WithVersion         bool
+    Recurse             bool
 }
 
-func installRequirements(reqs, packageTool, autoYes, sudo string, quiet, force bool) {
-    log.Info("Installing system requirements with " + packageTool)
-    log.Info(sudo + packageTool + " install " + autoYes + reqs)
-    forceArg := ""
-    if force {
-        if packageTool == "brew" {
-            forceArg = "--force "
-        } else {
-            forceArg = "-f "
-        }
-    }
-    cmd := exec.Command("/bin/sh", "-c", sudo+packageTool+" install "+forceArg+autoYes+reqs)
-    var out bytes.Buffer
-    var stderr bytes.Buffer
-    cmd.Stdout = &out
-    cmd.Stderr = &stderr
-    err := cmd.Run()
-    if !quiet {
-        fmt.Print(string(out.String()))
-    }
-    if err != nil {
-        log.Fatal(stderr.String())
-    }
-}
-
-func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string) {
+func (rp RequirementsParser) parseTooling() (sudo, autoYes, packageTool string) {
     switch runtime.GOOS {
     case "linux":
-        if !useStdout {
+        if !rp.UseStdout {
             log.Info("Linux system detected")
         }
         linuxTools := []string{
             "apt",
             "dnf",
-            "yum",
         }
         for _, tool := range linuxTools {
             if isCommandAvailable(tool) {
@@ -235,7 +173,7 @@ func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string)
         sudo = "sudo "
         autoYes = "-y "
     case "darwin":
-        if !useStdout {
+        if !rp.UseStdout {
             log.Info("Darwin system detected")
         }
         if !isCommandAvailable("brew") {
@@ -248,6 +186,91 @@ func determinePackageTooling(useStdout bool) (sudo, autoYes, packageTool string)
     }
 
     return sudo, autoYes, packageTool
+}
+
+func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
+    sudo, autoYes, packageTool = rp.parseTooling()
+
+    if rp.Dir != "" {
+        if strings.Contains(rp.Dir, ",") {
+            reqs = getSysRequirementsMultipleDirs(strings.Split(rp.Dir, ","), packageTool, rp.Recurse)
+        } else {
+            reqs = getSysRequirements(rp.Dir, packageTool, rp.Recurse)
+        }
+    } else if rp.File != "" {
+        b, err := ioutil.ReadFile(rp.File)
+        fatalCheck(err)
+        reqs = string(b)
+    } else if rp.UseStdin {
+        reader := bufio.NewReader(os.Stdin)
+        reqs, _ = reader.ReadString('\n')
+    } else if rp.UseStdout {
+        switch packageTool {
+        case "apt":
+            reqs = getInstalledAptRequirements(rp.WithVersion)
+        case "brew":
+            reqs = getInstalledBrewRequirements()
+        case "dnf":
+            reqs = getInstalledDnfRequirements(rp.WithVersion)
+        }
+        fmt.Print(reqs)
+        os.Exit(0)
+    } else {
+        // parse the current directory
+        reqs = getSysRequirements(".", packageTool, rp.Recurse)
+    }
+    reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
+    return sudo, packageTool, autoYes, reqs
+}
+
+type PackageConfig struct {
+    Tool          string
+    Sudo, AutoYes string
+    Reqs          string
+    Quiet, Force  bool
+}
+
+func (pc PackageConfig) Install() {
+    log.Info("Installing system requirements with " + pc.Tool)
+    forceArg := ""
+    if pc.Force {
+        if pc.Tool == "brew" {
+            forceArg = "--force "
+        } else {
+            forceArg = "-f "
+        }
+    }
+    cmdStr := pc.Sudo + pc.Tool + " install " + pc.AutoYes + forceArg + pc.Reqs
+    log.Info(cmdStr)
+    cmd := exec.Command("/bin/sh", "-c", cmdStr)
+    var out bytes.Buffer
+    var stderr bytes.Buffer
+    cmd.Stdout = &out
+    cmd.Stderr = &stderr
+    err := cmd.Run()
+    if !pc.Quiet {
+        fmt.Print(string(out.String()))
+    }
+    if err != nil {
+        log.Fatal(stderr.String())
+    }
+}
+
+func (pc PackageConfig) Update() {
+    log.Info("Updating " + pc.Tool + " packages")
+    forceArg := ""
+    if pc.Force {
+        if pc.Tool == "brew" {
+            forceArg = "--force "
+        } else {
+            forceArg = "-f "
+        }
+    }
+    if pc.Tool == "brew" {
+        runShell(pc.Tool + " update " + forceArg)
+    } else {
+        runShell("sudo " + pc.Tool + " update " + forceArg + pc.AutoYes)
+    }
 }
 
 func main() {
@@ -272,14 +295,27 @@ func main() {
         log.SetLevel(log.ErrorLevel)
     }
 
-    sudo, autoYes, packageTool := determinePackageTooling(*useStdoutPtr)
-
-    reqs := parseRequirements(*dirPtr, *filePtr, packageTool,
-        *useStdoutPtr, *useStdinPtr, *withVersionPtr, *recursePtr)
-
-    if *updatePtr {
-        updatePackages(packageTool)
+    rp := RequirementsParser{
+        Dir:         *dirPtr,
+        File:        *filePtr,
+        UseStdout:   *useStdoutPtr,
+        UseStdin:    *useStdinPtr,
+        WithVersion: *withVersionPtr,
+        Recurse:     *recursePtr,
     }
 
-    installRequirements(reqs, packageTool, autoYes, sudo, *quietPtr, *forcePtr)
+    sudo, packageTool, autoYes, reqs := rp.Parse()
+
+    pc := PackageConfig{
+        Tool:    packageTool,
+        Sudo:    sudo,
+        AutoYes: autoYes,
+        Reqs:    reqs,
+        Force:   *forcePtr,
+        Quiet:   *quietPtr,
+    }
+    if *updatePtr {
+        pc.Update()
+    }
+    pc.Install()
 }
