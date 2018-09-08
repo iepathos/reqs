@@ -30,6 +30,10 @@ Automaticaly finds apt-requirements.txt, brew-requirements.txt, dnf-requirements
 
 For an example reqs.yml see [https://github.com/iepathos/reqs/blob/master/examples/reqs.yml](https://github.com/iepathos/reqs/blob/master/examples/reqs.yml)
 
+View reqs args and their descriptions
+```
+reqs -h
+```
 
 ```
 reqs
