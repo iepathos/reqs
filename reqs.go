@@ -6,6 +6,7 @@ import (
     "flag"
     "fmt"
     log "github.com/sirupsen/logrus"
+    "gopkg.in/yaml.v2"
     "io/ioutil"
     "os"
     "os/exec"
@@ -98,6 +99,7 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
     // accept packageTool-requirements.txt and common-requirements.txt
     commonRequirements := "common-requirements.txt"
     toolRequirements := packageTool + "-requirements.txt"
+    reqsYml := "reqs.yml"
 
     for _, fname := range fileNames {
         if strings.Contains(fname, commonRequirements) || strings.Contains(fname, toolRequirements) {
@@ -105,6 +107,23 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
             b, err := ioutil.ReadFile(fname)
             fatalCheck(err)
             text += "\n" + string(b)
+        } else if strings.Contains(fname, reqsYml) {
+            log.Info("Found " + fname)
+            b, err := ioutil.ReadFile(fname)
+            fatalCheck(err)
+            m := make(map[string][]string)
+            err = yaml.Unmarshal(b, &m)
+            fatalCheck(err)
+
+            for tool, packages := range m {
+                if tool == "common" || tool == packageTool {
+                    // add the list to text
+                    for _, p := range packages {
+                        text += "\n" + string(p)
+                    }
+
+                }
+            }
         }
     }
     if len(text) == 0 {

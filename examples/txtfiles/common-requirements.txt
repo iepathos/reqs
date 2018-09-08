@@ -1,0 +1,10 @@
+curl
+git
+git-crypt
+git-lfs
+zsh
+wget
+nmap
+bmon
+htop
+ripgrep

@@ -1,0 +1,20 @@
+common:
+  - curl
+  - git
+  - git-crypt
+  - git-lfs
+  - zsh
+  - wget
+  - nmap
+  - bmon
+  - htop
+  - ripgrep
+apt:
+  - apt-transport-https
+  - ca-certificates
+  - software-properties-common
+  - golang-go
+brew:
+  - coreutils
+  - go
+  - zsh-completions
