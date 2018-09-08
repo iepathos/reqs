@@ -69,7 +69,7 @@ func recurseForRequirementsFiles(searchPath string) []string {
     return requirementsFilePaths
 }
 
-func getSysRequirements(dirPath, packageTool string, recurse bool) string {
+func getSysRequirements(dirPath, packageTool string, recurse bool) (text string) {
     fileNames := []string{}
     if recurse {
         fileNames = recurseForRequirementsFiles(dirPath)
@@ -85,7 +85,6 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) string {
     commonRequirements := "common-requirements.txt"
     toolRequirements := packageTool + "-requirements.txt"
 
-    text := ""
     for _, fname := range fileNames {
         if strings.Contains(fname, commonRequirements) || strings.Contains(fname, toolRequirements) {
             log.Info("Found " + fname)
