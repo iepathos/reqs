@@ -91,5 +91,4 @@ reqs -force
 TODO:
 + refactor reqs code until it's beautiful
 + add dnf compatibility for fedora setups
-+ add yum compatibility for centos?
 + add pip, gem, npm, and bower comprehension or just stick to system packages?
