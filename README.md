@@ -15,9 +15,16 @@ reqs can generate the requirements for these files based on what is currently av
 
 Example setup [https://github.com/iepathos/reup](https://github.com/iepathos/reup)
 
+## Installation
 
+Download the latest release for your system from [https://github.com/iepathos/reqs/releases](https://github.com/iepathos/reqs/releases)
 
-Usage:
+Or install with go if you're gopher inclined
+```
+go get -u github.com/iepathos/reqs
+```
+
+## Usage
 
 Automaticaly find and detect tool-requirements.txt in the directory.  common-requirements.txt accepts for cross-platform shared system dependencies.
 ```
