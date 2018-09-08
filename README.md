@@ -77,9 +77,9 @@ reqs -o > apt-requirements.txt
 ```
 
 
-generate apt requirements with the specific versions installed
+generate apt requirements with the versions info locked installed
 ```
-reqs -o -v > apt-requirements.txt
+reqs -ov > apt-requirements.txt
 ```
 
 generate brew requirements from the currently install brew packages

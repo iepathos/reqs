@@ -362,7 +362,7 @@ func main() {
     filePtr := flag.String("f", "", "specific requirements file to read from")
     useStdoutPtr := flag.Bool("o", false, "stdout the currently installed requirements for apt or brew")
     useStdinPtr := flag.Bool("i", false, "use stdin for requirements")
-    withVersionPtr := flag.Bool("v", false, "save version with output requirements command")
+    withVersionPtr := flag.Bool("ov", false, "stdout the currently installed apt packages with version info")
     quietPtr := flag.Bool("q", false, "silence logging to error level")
     recursePtr := flag.Bool("r", false, "recurse down directories to find requirements")
     updatePtr := flag.Bool("u", false, "update packages before install")
