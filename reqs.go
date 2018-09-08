@@ -331,13 +331,13 @@ func (pc PackageConfig) Install() {
     }
 }
 
-func (pc PackageConfig) abstractUp(arg string) {
+func (pc PackageConfig) abstractUp(upArg string) {
     log.Info("Updating " + pc.Tool + " packages")
     forceArg := pc.getForceArg()
     if pc.Tool == "brew" {
-        runShell(pc.Tool + " " + arg + " " + forceArg)
+        runShell(pc.Tool + " " + upArg + " " + forceArg)
     } else {
-        runShell("sudo " + pc.Tool + " " + arg + " " + forceArg + pc.AutoYes)
+        runShell("sudo " + pc.Tool + " " + upArg + " " + forceArg + pc.AutoYes)
     }
 }
 
