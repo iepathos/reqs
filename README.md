@@ -30,7 +30,7 @@ Download the latest release for your system from [https://github.com/iepathos/re
 
 Or install with go if you're gopher inclined
 ```
-go get -u github.com/iepathos/reqs
+go get -u github.com/iepathos/reqs/cmd/reqs
 ```
 
 ## Usage
