@@ -2,8 +2,7 @@
 # Make sure to check the documentation at http://goreleaser.com
 builds:
   main: ./cmd/reqs/main.go
-
-- env:
+env:
   - CGO_ENABLED=0
 archive:
   replacements:
