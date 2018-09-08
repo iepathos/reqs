@@ -22,7 +22,7 @@ changelog:
 brew:
   github:
     owner: iepathos
-    name: reqs
+    name: homebrew-reqs
 
   # Template for the url.
   # Default is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
