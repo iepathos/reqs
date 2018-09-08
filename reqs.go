@@ -294,7 +294,7 @@ func main() {
     recursePtr := flag.Bool("r", false, "recurse down directories to find requirements")
     updatePtr := flag.Bool("u", false, "update packages before install")
     forcePtr := flag.Bool("force", false, "force reinstall packages")
-    upgradePtr := flag.Bool("up", false, "upgade packages before install")
+    upgradePtr := flag.Bool("up", false, "update and upgrade packages before install")
     flag.Parse()
 
     if !*quietPtr {
