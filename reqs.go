@@ -30,6 +30,27 @@ func newLineIfNotEmpty(text, newText string) string {
     return text
 }
 
+func stringInSlice(a string, list []string) bool {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}
+
+func appendNewLinesOnly(text, newText string) string {
+    textSplit := strings.Split(text, "\n")
+    newTextSplit := strings.Split(newText, "\n")
+    returnText := text
+    for _, line := range newTextSplit {
+        if !stringInSlice(line, textSplit) {
+            returnText += "\n" + line
+        }
+    }
+    return returnText
+}
+
 func isCommandAvailable(name string) bool {
     cmd := exec.Command("/bin/sh", "-c", "command -v "+name)
     if err := cmd.Run(); err != nil {
@@ -106,7 +127,8 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
             log.Info("Found " + fname)
             b, err := ioutil.ReadFile(fname)
             fatalCheck(err)
-            text += "\n" + string(b)
+            text = appendNewLinesOnly(text, string(b))
+            // text += "\n" + string(b)
         } else if strings.Contains(fname, reqsYml) {
             log.Info("Found " + fname)
             b, err := ioutil.ReadFile(fname)
@@ -119,7 +141,8 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
                 if tool == "common" || tool == packageTool {
                     // add the list to text
                     for _, p := range packages {
-                        text += "\n" + string(p)
+                        // text += "\n" + string(p)
+                        text = appendNewLinesOnly(text, string(p))
                     }
 
                 }
