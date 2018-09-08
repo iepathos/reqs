@@ -26,7 +26,11 @@ go get -u github.com/iepathos/reqs
 
 ## Usage
 
-Automaticaly find and detect tool-requirements.txt in the directory.  common-requirements.txt accepts for cross-platform shared system dependencies.
+Automaticaly finds apt-requirements.txt, brew-requirements.txt, dnf-requirements.txt, common-requirements.txt, and reqs.yml files.  common-requirements.txt are accepted for cross-platform shared same-name system dependencies.
+
+For an example reqs.yml see [https://github.com/iepathos/reqs/blob/master/examples/reqs.yml](https://github.com/iepathos/reqs/blob/master/examples/reqs.yml)
+
+
 ```
 reqs
 ```
