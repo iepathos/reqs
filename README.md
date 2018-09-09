@@ -118,6 +118,8 @@ Must have Go installed.  Recent version is better.  Relies on go-dep and go-rele
 ./release.sh
 ```
 
+Must export GITHUB_TOKEN with permission to push to origin master for the git repo.  If you just fork off github.com/iepathos/reqs and then use a personal access github token with repo permission you should be groovy.
+
 ## Todo
 
 + refactor reqs code until it's beautiful
