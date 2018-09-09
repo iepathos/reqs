@@ -50,7 +50,7 @@ view reqs args and their descriptions
 reqs -h
 ```
 
-install all of the example projects
+install all of the example projects with system pip and system npm
 ```
 reqs -r -d examples -spip -snpm
 ```
