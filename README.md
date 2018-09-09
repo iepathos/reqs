@@ -45,11 +45,17 @@ For an example reqs.yml see [https://github.com/iepathos/reqs/blob/master/exampl
 
 Example dev setup [https://github.com/iepathos/reup](https://github.com/iepathos/reup)
 
-View reqs args and their descriptions
+view reqs args and their descriptions
 ```
 reqs -h
 ```
 
+install all of the example projects
+```
+reqs -r -d examples -pip pip -snpm
+```
+
+install requirements in the current directory
 ```
 reqs
 ```
