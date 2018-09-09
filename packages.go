@@ -30,7 +30,11 @@ func PipInstall(requirements string, sudo, upgrade, quiet bool) {
 	if upgrade {
 		upgradeArg = "--upgrade "
 	}
-	cmdStr := sudoArg + "pip " + "install " + upgradeArg + requirements
+	quietArg := ""
+	if quiet {
+		quietArg = "-q "
+	}
+	cmdStr := sudoArg + "pip " + "install " + upgradeArg + quietArg + requirements
 	if !quiet {
 		log.Info(cmdStr)
 	}
