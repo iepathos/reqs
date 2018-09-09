@@ -1,0 +1,6 @@
+apt:
+  - nodejs
+brew:
+  - node
+dnf:
+  - nodejs
