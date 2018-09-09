@@ -109,6 +109,11 @@ force reinstall of packages
 reqs -force
 ```
 
+install pip dependencies from any found 'requirements.txt' files after system dependencies. Must specify path to the pip executable to use.  Can also specify pip requirements inside of reqs.yml under a pip section.
+```
+reqs -pip $(which pip)
+``
+
 ## Building
 
 Must have Go installed.  Recent version is better.  Relies on go-dep and go-releaser.  Build script will attempt to install/update both and whatever other deps reqs has using dep.
