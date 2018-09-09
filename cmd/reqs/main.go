@@ -4,6 +4,7 @@ import (
     "flag"
     "github.com/iepathos/reqs"
     log "github.com/sirupsen/logrus"
+    "os"
 )
 
 func main() {
@@ -23,13 +24,14 @@ func main() {
     upgradePtr := flag.Bool("up", false, "update and upgrade packages before install")
     sourcesPtr := flag.Bool("so", false, "stdout package tool sources")
     pipPtr := flag.String("pip", "", "install pip dependencies from any 'requirements.txt' found, this arg must be given the path to the pip executable to use")
+    ymlPtr := flag.Bool("yml", false, "stdout the currently installed system requirements in yml format")
     // npmPtr := flag.Bool("npm", false, "install npm dependencies from packages.json or npm reqs.yml blocks")
     flag.Parse()
 
     if *withVersionPtr {
         *useStdoutPtr = true
     }
-    if *sourcesPtr || *useStdoutPtr {
+    if *sourcesPtr || *useStdoutPtr || *ymlPtr {
         log.SetLevel(log.ErrorLevel)
     } else if !*quietPtr {
         log.SetLevel(log.DebugLevel)
@@ -45,6 +47,11 @@ func main() {
         WithVersion: *withVersionPtr,
         Recurse:     *recursePtr,
         Sources:     *sourcesPtr,
+    }
+    if *ymlPtr {
+        ymlMap := rp.GenerateReqsYml()
+        reqs.StdoutReqsYml(ymlMap)
+        os.Exit(0)
     }
 
     sudo, packageTool, autoYes, requirements := rp.Parse()

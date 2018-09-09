@@ -189,7 +189,7 @@ func aptListInstalled(withVersion bool) (reqs string) {
 			reqs = NewLineIfNotEmpty(reqs, req)
 		}
 	}
-	return reqs
+	return strings.TrimSpace(reqs)
 }
 
 func brewListInstalled() string {
@@ -341,4 +341,35 @@ func (rp RequirementsParser) ParsePip() (reqs string) {
 		reqs = getPipRequirements(".", rp.Recurse)
 	}
 	return reqs
+}
+
+// TODO: check the exist reqs.yml in current directory if one exists
+// and merge the results together, removing duplicate entries
+// check the currently installed packages for system and/or pip deps
+// and return the string for a reqs.yml
+func (rp RequirementsParser) GenerateReqsYml() map[string][]string {
+	yml := make(map[string][]string)
+	_, packageTool, _ := rp.parseTooling()
+	installed := ""
+	if packageTool == "apt" {
+		installed = aptListInstalled(rp.WithVersion)
+	} else if packageTool == "brew" {
+		installed = brewListInstalled()
+	} else if packageTool == "dnf" {
+		installed = dnfListInstalled(rp.WithVersion)
+	}
+
+	yml[packageTool] = strings.Split(installed, " ")
+	return yml
+}
+
+func StdoutReqsYml(yml map[string][]string) {
+	for tool, packages := range yml {
+		fmt.Println(tool + ":")
+		for _, p := range packages {
+			for _, line := range strings.Split(p, "\n") {
+				fmt.Println("  - " + line)
+			}
+		}
+	}
 }
