@@ -1,3 +1,6 @@
+common:
+  - git
+  - curl
 apt:
   - golang-go
 brew:
