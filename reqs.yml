@@ -1,0 +1,6 @@
+apt:
+  - golang-go
+brew:
+  - go
+dnf:
+  - golang
