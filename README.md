@@ -52,7 +52,7 @@ reqs -h
 
 install all of the example projects
 ```
-reqs -r -d examples -pip pip -snpm
+reqs -r -d examples -spip -snpm
 ```
 
 install requirements in the current directory
