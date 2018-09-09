@@ -25,10 +25,20 @@ func installHomebrew() {
 	FatalCheck(err)
 }
 
-func getAptSources() string {
+func getAptSources() (out string) {
 	b, err := ioutil.ReadFile("/etc/apt/sources.list")
 	FatalCheck(err)
-	return strings.TrimSpace(string(b))
+	// clean empty lines and comments out
+	for _, line := range strings.Split(string(b), "\n") {
+		if !strings.HasPrefix(line, "#") && strings.TrimSpace(line) != "" {
+			if out == "" {
+				out = strings.TrimSpace(line)
+			} else {
+				out += "\n" + strings.TrimSpace(line)
+			}
+		}
+	}
+	return out
 }
 
 func getBrewTaps() string {
