@@ -1,9 +1,10 @@
 apt:
-  - python-pip
+  - python-pip python-dev
 brew:
   - python
 dnf:
-  - python-pip
+  - python-pip python
 pip:
   - numpy
   - scipy
+

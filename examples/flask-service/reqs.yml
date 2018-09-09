@@ -1,0 +1,8 @@
+apt:
+  - python python-pip
+brew:
+  - python
+dnf:
+  - python python-pip
+pip:
+  - flask
