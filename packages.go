@@ -79,7 +79,11 @@ func (pc PackageConfig) getForceArg() (forceArg string) {
 func (pc PackageConfig) Install() {
 	log.Info("Installing system requirements with " + pc.Tool)
 	forceArg := pc.getForceArg()
-	cmdStr := pc.Sudo + pc.Tool + " install " + pc.AutoYes + forceArg + pc.Reqs
+	envArg := ""
+	if pc.Tool == "brew" {
+		envArg += "HOMEBREW_NO_AUTO_UPDATE=1 "
+	}
+	cmdStr := envArg + pc.Sudo + pc.Tool + " install " + pc.AutoYes + forceArg + pc.Reqs
 	log.Info(cmdStr)
 	cmd := exec.Command("/bin/sh", "-c", cmdStr)
 	var out bytes.Buffer
