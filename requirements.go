@@ -15,43 +15,6 @@ import (
 
 // requirements for parsing requirements files
 // and for determining currently installed requirements
-func isCommandAvailable(name string) bool {
-	cmd := exec.Command("/bin/sh", "-c", "command -v "+name)
-	if err := cmd.Run(); err != nil {
-		return false
-	}
-	return true
-}
-
-func newLineIfNotEmpty(text, newText string) string {
-	if text == "" {
-		text = newText
-	} else {
-		text += "\n" + newText
-	}
-	return text
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
-
-func appendNewLinesOnly(text, newText string) string {
-	textSplit := strings.Split(text, "\n")
-	newTextSplit := strings.Split(newText, "\n")
-	returnText := text
-	for _, line := range newTextSplit {
-		if !stringInSlice(line, textSplit) {
-			returnText += "\n" + line
-		}
-	}
-	return returnText
-}
 
 func installHomebrew() {
 	log.Info("Installing homebrew")
@@ -75,15 +38,6 @@ func getBrewTaps() string {
 	return strings.TrimSpace(string(out))
 }
 
-func stringContainedInSlice(s string, arr []string) bool {
-	for _, v := range arr {
-		if strings.Contains(s, v) {
-			return true
-		}
-	}
-	return false
-}
-
 func recurseForFiles(dir string, fnames []string) (filePaths []string) {
 	filepathList := []string{}
 	err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
@@ -93,7 +47,7 @@ func recurseForFiles(dir string, fnames []string) (filePaths []string) {
 	FatalCheck(err)
 
 	for _, path := range filepathList {
-		if stringContainedInSlice(path, fnames) {
+		if StringContainedInSlice(path, fnames) {
 			filePaths = append(filePaths, path)
 		}
 	}
@@ -139,14 +93,14 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
 			log.Info("Found " + fname)
 			b, err := ioutil.ReadFile(fname)
 			FatalCheck(err)
-			text = appendNewLinesOnly(text, string(b))
+			text = AppendNewLinesOnly(text, string(b))
 		} else if strings.Contains(fname, reqsYml) {
 			log.Info("Found " + fname)
 			conf := ymlToMap(fname)
 			for tool, packages := range conf {
 				if tool == "common" || tool == packageTool {
 					for _, p := range packages {
-						text = appendNewLinesOnly(text, string(p))
+						text = AppendNewLinesOnly(text, string(p))
 					}
 				}
 			}
@@ -160,7 +114,7 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
 
 func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) (reqs string) {
 	for _, dirPath := range dirPaths {
-		reqs = newLineIfNotEmpty(reqs, getSysRequirements(dirPath, packageTool, recurse))
+		reqs = NewLineIfNotEmpty(reqs, getSysRequirements(dirPath, packageTool, recurse))
 	}
 	return reqs
 }
@@ -176,7 +130,7 @@ func aptListInstalled(withVersion bool) (reqs string) {
 				version := strings.Split(lSplit[1], " ")[1]
 				req = req + "=" + version
 			}
-			reqs = newLineIfNotEmpty(reqs, req)
+			reqs = NewLineIfNotEmpty(reqs, req)
 		}
 	}
 	return reqs
@@ -199,7 +153,7 @@ func dnfListInstalled(withVersion bool) (reqs string) {
 				version := strings.Split(lSplit[1], " ")[0]
 				req = req + "=" + version
 			}
-			reqs = newLineIfNotEmpty(reqs, req)
+			reqs = NewLineIfNotEmpty(reqs, req)
 		}
 	}
 	return reqs
@@ -237,7 +191,7 @@ func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) 
 			"dnf",
 		}
 		for _, tool := range linuxTools {
-			if isCommandAvailable(tool) {
+			if IsCommandAvailable(tool) {
 				packageTool = tool
 				break
 			}
@@ -248,7 +202,7 @@ func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) 
 		if !rp.UseStdout {
 			log.Info("Darwin system detected")
 		}
-		if !isCommandAvailable("brew") {
+		if !IsCommandAvailable("brew") {
 			installHomebrew()
 		}
 		packageTool = "brew"
