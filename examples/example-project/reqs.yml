@@ -18,3 +18,5 @@ brew:
   - coreutils
   - go
   - zsh-completions
+dnf:
+  - golang

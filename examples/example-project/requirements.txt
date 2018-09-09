@@ -1,0 +1,9 @@
+semver==2.7.7
+termcolor==1.1.0
+glob2==0.6
+coloredlogs==7.3.1
+humanfriendly==4.4.1
+monotonic==1.4
+verboselogs==1.7
+colorama==0.3.9
+cursor==1.1.0
