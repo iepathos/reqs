@@ -45,13 +45,11 @@ func PipInstall(requirements string, sudo, upgrade, quiet bool) {
 		"PYENV_VIRTUAL_ENV=" + os.ExpandEnv("$PYENV_VIRTUAL_ENV"),
 		"PYENV_VERSION=" + os.ExpandEnv("$PYENV_VERSION"),
 	}
-	// log.Info(cmd.Env)
 	err := cmd.Run()
 	if !quiet {
 		fmt.Print(string(out.String()))
 	}
 	if err != nil {
-		// log.Fatal(err)
 		log.Fatal(stderr.String())
 	}
 }
