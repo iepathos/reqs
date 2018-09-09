@@ -172,7 +172,7 @@ func findNpmPackageDirs(dir string, recurse bool) (packageDirs []string) {
 	const packageJson = "package.json"
 	if recurse {
 		err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
-			if strings.Contains(path, packageJson) && !strings.Contains(path, "node_modules") {
+			if strings.Contains(path, packageJson) && !strings.Contains(path, "node_modules") && !strings.Contains(path, "bower_components") {
 				d, _ := filepath.Split(path)
 				log.Info("Found npm package directory " + d)
 				packageDirs = append(packageDirs, d)
@@ -192,7 +192,6 @@ func findNpmPackageDirs(dir string, recurse bool) (packageDirs []string) {
 func getNpmRequirements(dir string, recurse bool) (text string) {
 	const reqsYml = "reqs.yml"
 	const npmRequirements = "npm-requirements.txt"
-	// const packagesJson = "packages.json"
 	fileNames := getRequirementFilenames(dir, recurse)
 	// TODO:
 	// npmMap := make(map[string]string)
