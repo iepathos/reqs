@@ -55,7 +55,7 @@ func (pc PackageConfig) Install() {
 }
 
 func (pc PackageConfig) abstractUp(upArg string) {
-	log.Info("Updating " + pc.Tool + " packages")
+	log.Info("Running " + pc.Tool + " packages " + upArg)
 	forceArg := pc.getForceArg()
 	if pc.Tool == "brew" {
 		runShell(pc.Tool + " " + upArg + " " + forceArg)
