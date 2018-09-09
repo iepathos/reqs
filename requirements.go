@@ -210,7 +210,7 @@ func dnfListInstalled(withVersion bool) (reqs string) {
 		}
 		reqs = NewLineIfNotEmpty(reqs, req)
 	}
-	return reqs
+	return strings.TrimSpace(reqs)
 }
 
 type RequirementsParser struct {
