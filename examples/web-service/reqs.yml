@@ -3,7 +3,7 @@ apt:
 brew:
   - node
 dnf:
-  - nodejs
+  - nodejs npm
 npm:
   - npm
   - bower

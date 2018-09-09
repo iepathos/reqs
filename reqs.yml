@@ -1,9 +1,13 @@
 common:
   - git
   - curl
+  - virtualbox
+  - vagrant
 apt:
   - golang-go
 brew:
   - go
 dnf:
   - golang
+  - libvirt
+  - vagrant-libvirt 
