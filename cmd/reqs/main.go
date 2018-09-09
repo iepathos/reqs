@@ -88,7 +88,7 @@ func main() {
     if *upgradePtr {
         pc.Upgrade()
     }
-    pc.Install()
+    // pc.Install()
 
     if *pipPtr != "" {
         reqs.PipInstall(pipRequirements, *pipPtr, *sudoPipPtr, *upgradePtr, *quietPtr)
@@ -96,6 +96,13 @@ func main() {
     if *npmPtr {
         globalArg := true
         fromDirectory := ""
+        // install global npm requirements
         reqs.NpmInstall(npmRequirements, fromDirectory, *sudoNpmPtr, globalArg, *quietPtr)
+        // any directories with package.json in them but where
+        // node_modules is not part of the path run just `npm install` inside
+        packageDirs := rp.FindNpmPackageDirs()
+        for _, pkgDir := range packageDirs {
+            reqs.NpmInstall("", pkgDir, false, false, *quietPtr)
+        }
     }
 }

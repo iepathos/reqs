@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 // responsible for interfacing with package tools
@@ -58,7 +59,14 @@ func PipInstall(requirements, pipPath string, sudo, upgrade, quiet bool) {
 }
 
 func NpmInstall(requirements, dir string, sudo, global, quiet bool) {
-	log.Info("Installing npm requirements")
+	if dir != "" {
+		dir, _ = filepath.Abs(dir)
+	}
+	if global {
+		log.Info("Installing npm global requirements")
+	} else {
+		log.Info("Running npm install for package.json files")
+	}
 	sudoArg := ""
 	if sudo {
 		sudoArg = "sudo "
@@ -85,6 +93,7 @@ func NpmInstall(requirements, dir string, sudo, global, quiet bool) {
 		fmt.Print(string(out.String()))
 	}
 	if err != nil {
+		log.Fatal(err)
 		log.Fatal(stderr.String())
 	}
 }

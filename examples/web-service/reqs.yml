@@ -1,5 +1,5 @@
 apt:
-  - nodejs
+  - nodejs npm
 brew:
   - node
 dnf:

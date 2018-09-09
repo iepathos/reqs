@@ -168,11 +168,32 @@ func getPipRequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs strin
 	return reqs
 }
 
-func getNpmRequirements(dirPath string, recurse bool) (text string) {
+func findNpmPackageDirs(dir string, recurse bool) (packageDirs []string) {
+	const packageJson = "package.json"
+	if recurse {
+		err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
+			if strings.Contains(path, packageJson) && !strings.Contains(path, "node_modules") {
+				d, _ := filepath.Split(path)
+				log.Info("Found npm package directory " + d)
+				packageDirs = append(packageDirs, d)
+			}
+			return nil
+		})
+		FatalCheck(err)
+	} else {
+		if _, err := os.Stat(dir + "/" + packageJson); !os.IsNotExist(err) {
+			log.Info("Found npm package directory " + dir)
+			packageDirs = append(packageDirs, dir)
+		}
+	}
+	return packageDirs
+}
+
+func getNpmRequirements(dir string, recurse bool) (text string) {
 	const reqsYml = "reqs.yml"
 	const npmRequirements = "npm-requirements.txt"
 	// const packagesJson = "packages.json"
-	fileNames := getRequirementFilenames(dirPath, recurse)
+	fileNames := getRequirementFilenames(dir, recurse)
 	// TODO:
 	// npmMap := make(map[string]string)
 	// dir: packages
@@ -256,6 +277,15 @@ type RequirementsParser struct {
 	WithVersion         bool
 	Recurse             bool
 	Sources             bool
+}
+
+func (rp RequirementsParser) FindNpmPackageDirs() (packageDirs []string) {
+	dirArg := "."
+	if rp.Dir != "" {
+		dirArg = rp.Dir
+	}
+	packageDirs = findNpmPackageDirs(dirArg, rp.Recurse)
+	return packageDirs
 }
 
 func (rp RequirementsParser) ListInstalled(packageTool string) (requirements string) {
