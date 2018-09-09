@@ -1,6 +1,8 @@
 # reqs
 
-Reqs is a cross-platform Linux and MacOSX systems package management tool. It wraps apt, homebrew, dnf and is able to automatically which tool to use based on the system it is on and installs the appropriate dependenices from any number of requirements files or reqs.yml files.  Can automatically update and/or upgrade before installing the reqs with an arg.  Has many useful args.  The main focus of reqs is system package management abstraction with pip and possibly gem support added as an after thought to ease some project deployments.  Because pip and ruby reqs generally don't differ from system-to-system abstracting the tools is not so important to reqs.
+Reqs is a cross-platform Linux and MacOSX systems package management tool. It wraps apt, homebrew, dnf and is able to automatically determine the right tool to use based on the system.  It checks requirements files and/or reqs.yml files.  
+
+The main focus of reqs is system package management abstraction with pip and possibly gem support added as an after thought to ease some project deployments.  Because pip and ruby reqs generally don't differ from system-to-system abstracting those tools is not so important to reqs.
 
 Best way to use reqs is with a reqs.yml file in you repositories.
 
@@ -28,13 +30,7 @@ reqs automatically determines the tool to used based on the system and what is a
 
 ## Installation
 
-Fast
-```
-bash -c "$(curl -sL https://raw.githubusercontent.com/iepathos/reqs/master/download.sh)"
-```
-
-
-Or download the latest release for your system from [https://github.com/iepathos/reqs/releases](https://github.com/iepathos/reqs/releases)
+Download the latest release for your system from [https://github.com/iepathos/reqs/releases](https://github.com/iepathos/reqs/releases)
 
 Or install with go if you're gopher inclined
 ```
