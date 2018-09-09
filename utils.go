@@ -52,9 +52,9 @@ func AppendNewLinesOnly(text, newText string) (returnText string) {
 	newTextSplit := strings.Split(newText, "\n")
 	returnText = text
 	for _, line := range newTextSplit {
-		if !StringInSlice(line, textSplit) {
-			returnText += "\n" + line
+		if !StringInSlice(strings.TrimSpace(line), textSplit) {
+			returnText += "\n" + strings.TrimSpace(line)
 		}
 	}
-	return returnText
+	return strings.TrimSpace(returnText)
 }
