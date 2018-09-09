@@ -122,8 +122,10 @@ Must have Go installed.  Recent version is better.  Relies on go-dep and go-rele
 ./build.sh
 ```
 
+## Note
+This is a little passion side project for me.  My goal is to have beautiful code here even if this project isn't used widely.  If you have an idea you want implemented with this tool let me know about it. I will review and accept pull requests.  I open sourced this project so feel free to hack it up however you see fit.
+
 ## Todo
 
-+ refactor reqs code until it's beautiful
 + test dnf compatibility for fedora setups
-+ add pip, gem, npm, and bower comprehension or just stick to system packages?
++ add gem, npm, and bower comprehension or just stick to system packages?
