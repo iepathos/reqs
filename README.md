@@ -111,16 +111,14 @@ force reinstall of packages
 reqs -force
 ```
 
-## Building
+## Releasing
 
-Must have Go installed.  Recent version is better.  Relies on go-dep and go-releaser.  Build script will attempt to install/update both and whatever other deps reqs has using dep.
-
+Must have Go installed.  Recent version is better.  Relies on go-dep and go-releaser.  `release.sh` will attempt to install/update both  go packages and whatever other deps reqs has using dep.  git tag the current commit you wish to release with the next appropriate version tag and run
 ```
-./build.sh
+./release.sh
 ```
 
 ## Todo
 
 + refactor reqs code until it's beautiful
-+ test dnf compatibility for fedora setups
-+ add pip, gem, npm, and bower comprehension or just stick to system packages?
++ add gem, npm, and bower comprehension or just stick to system packages?
