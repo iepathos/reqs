@@ -63,7 +63,7 @@ func NpmInstall(requirements, path string, global, quiet bool) {
 	if global {
 		globalArg = "-g "
 	}
-	cmdStr := "npm" + globalArg + " install " + requirements
+	cmdStr := "npm " + globalArg + " install " + requirements
 	cmd := exec.Command("/bin/sh", "-c", cmdStr)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
