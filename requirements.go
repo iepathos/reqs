@@ -65,7 +65,11 @@ func getRequirementFilenames(dirPath string, recurse bool) (fileNames []string) 
 		files, err := ioutil.ReadDir(dirPath)
 		FatalCheck(err)
 		for _, f := range files {
-			fileNames = append(fileNames, dirPath+"/"+f.Name())
+			joinArg := ""
+			if !strings.HasSuffix(dirPath, "/") {
+				joinArg = "/"
+			}
+			fileNames = append(fileNames, dirPath+joinArg+f.Name())
 		}
 	}
 	return fileNames
