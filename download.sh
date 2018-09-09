@@ -2,9 +2,9 @@
 # downloads reqs from github release binary
 arch="$(uname)"
 if [[ "$arch" == "Darwin" ]]; then
-	curl -sL https://github.com/iepathos/reqs/releases/download/v0.2.6/reqs_0.2.6_Darwin_x86_64.tar.gz > reqs.tar.gz
+	curl -sL https://github.com/iepathos/reqs/releases/download/v0.2.7/reqs_0.2.7_Darwin_x86_64.tar.gz > reqs.tar.gz
 else
-	curl -sL https://github.com/iepathos/reqs/releases/download/v0.2.6/reqs_0.2.6_Linux_x86_64.tar.gz > reqs.tar.gz
+	curl -sL https://github.com/iepathos/reqs/releases/download/v0.2.7/reqs_0.2.7_Linux_x86_64.tar.gz > reqs.tar.gz
 fi
 tar -xzf reqs.tar.gz
 rm reqs.tar.gz
