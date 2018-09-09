@@ -20,12 +20,12 @@ func runShell(code string) {
 }
 
 // pip install given requirements, optionally --upgrade as well
-func PipInstall(requirements string, sudo, upgrade, quiet bool) {
+func PipInstall(requirements, pipPath string, upgrade, quiet bool) {
 	log.Info("Installing pip requirements to currently active environment")
 	sudoArg := ""
-	if sudo {
-		sudoArg = "sudo "
-	}
+	// if sudo {
+	// 	sudoArg = "sudo "
+	// }
 	upgradeArg := ""
 	if upgrade {
 		upgradeArg = "--upgrade "
@@ -34,7 +34,7 @@ func PipInstall(requirements string, sudo, upgrade, quiet bool) {
 	if quiet {
 		quietArg = "-q "
 	}
-	cmdStr := sudoArg + "pip " + "install " + upgradeArg + quietArg + requirements
+	cmdStr := sudoArg + pipPath + " install " + upgradeArg + quietArg + requirements
 	if !quiet {
 		log.Info(cmdStr)
 	}
