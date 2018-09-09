@@ -1,10 +1,12 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# test virtual machines with target operating systems
+
 Vagrant.configure("2") do |config|
   
   config.vm.provider "virtualbox" do |v|
-    v.memory = 1024
+    v.memory = 4096
     v.cpus = 2
   end
 
