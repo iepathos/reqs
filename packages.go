@@ -19,12 +19,12 @@ func runShell(code string) {
 }
 
 // pip install given requirements, optionally --upgrade as well
-func PipInstall(requirements, pipPath string, upgrade, quiet bool) {
+func PipInstall(requirements, pipPath string, sudo, upgrade, quiet bool) {
 	log.Info("Installing pip requirements to currently active environment")
 	sudoArg := ""
-	// if sudo {
-	// 	sudoArg = "sudo "
-	// }
+	if sudo {
+		sudoArg = "sudo "
+	}
 	upgradeArg := ""
 	if upgrade {
 		upgradeArg = "--upgrade "
@@ -47,6 +47,30 @@ func PipInstall(requirements, pipPath string, upgrade, quiet bool) {
 		"PYTHONPATH=" + os.ExpandEnv("$PYTHONPATH"),
 		"PYENV_VIRTUAL_ENV=" + os.ExpandEnv("$PYENV_VIRTUAL_ENV"),
 		"PYENV_VERSION=" + os.ExpandEnv("$PYENV_VERSION"),
+	}
+	err := cmd.Run()
+	if !quiet {
+		fmt.Print(string(out.String()))
+	}
+	if err != nil {
+		log.Fatal(stderr.String())
+	}
+}
+
+func NpmInstall(requirements, path string, global, quiet bool) {
+	log.Info("Installing npm requirements")
+	globalArg := ""
+	if global {
+		globalArg = "-g "
+	}
+	cmdStr := "npm" + globalArg + " install " + requirements
+	cmd := exec.Command("/bin/sh", "-c", cmdStr)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	cmd.Env = []string{
+		"PATH=" + os.ExpandEnv("$PATH"),
 	}
 	err := cmd.Run()
 	if !quiet {

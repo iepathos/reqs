@@ -23,6 +23,7 @@ func main() {
     upgradePtr := flag.Bool("up", false, "update and upgrade packages before install")
     sourcesPtr := flag.Bool("so", false, "stdout package tool sources")
     pipPtr := flag.String("pip", "", "install pip dependencies from any 'requirements.txt' found, this arg must be given the path to the pip executable to use")
+    // npmPtr := flag.Bool("npm", false, "install npm dependencies from packages.json or npm reqs.yml blocks")
     flag.Parse()
 
     if *withVersionPtr {
@@ -52,6 +53,10 @@ func main() {
     if *pipPtr != "" {
         pipRequirements = rp.ParsePip()
     }
+    // npmRequirements := ""
+    // if *npmPtr {
+    //     npmRequirements = rp.ParseNpm()
+    // }
 
     pc := reqs.PackageConfig{
         Tool:    packageTool,
@@ -70,6 +75,10 @@ func main() {
     pc.Install()
 
     if *pipPtr != "" {
-        reqs.PipInstall(pipRequirements, *pipPtr, *upgradePtr, *quietPtr)
+        pipSudo := false
+        reqs.PipInstall(pipRequirements, *pipPtr, pipSudo, *upgradePtr, *quietPtr)
     }
+    // if *npmPtr {
+    //     reqs.NpmInstall(npmRequirements)
+    // }
 }
