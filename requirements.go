@@ -13,7 +13,8 @@ import (
 	"strings"
 )
 
-// requirements parsing and generating functions
+// requirements for parsing requirements files
+// and for determining currently installed requirements
 func isCommandAvailable(name string) bool {
 	cmd := exec.Command("/bin/sh", "-c", "command -v "+name)
 	if err := cmd.Run(); err != nil {

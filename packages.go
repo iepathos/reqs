@@ -7,8 +7,8 @@ import (
 	"os/exec"
 )
 
-// responsible for dealing interfacing with package tools
-// deal with apt, brew, and dnf
+// responsible for interfacing with package tools
+// deals with apt, brew, and dnf
 
 func runShell(code string) {
 	log.Info(code)
