@@ -57,14 +57,22 @@ func PipInstall(requirements, pipPath string, sudo, upgrade, quiet bool) {
 	}
 }
 
-func NpmInstall(requirements, path string, global, quiet bool) {
+func NpmInstall(requirements, dir string, sudo, global, quiet bool) {
 	log.Info("Installing npm requirements")
+	sudoArg := ""
+	if sudo {
+		sudoArg = "sudo "
+	}
 	globalArg := ""
 	if global {
 		globalArg = "-g "
 	}
-	cmdStr := "npm " + globalArg + " install " + requirements
+	cmdStr := sudoArg + "npm " + globalArg + "install " + requirements
+	log.Info(cmdStr)
 	cmd := exec.Command("/bin/sh", "-c", cmdStr)
+	if dir != "" {
+		cmd.Dir = dir
+	}
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out

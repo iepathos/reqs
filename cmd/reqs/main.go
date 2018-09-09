@@ -26,7 +26,8 @@ func main() {
     pipPtr := flag.String("pip", "", "install pip dependencies from any 'requirements.txt' found, this arg must be given the path to the pip executable to use")
     sudoPipPtr := flag.Bool("spip", false, "install pip dependencies with sudo")
     ymlPtr := flag.Bool("yml", false, "stdout the currently installed system requirements in yml format")
-    // npmPtr := flag.Bool("npm", false, "install npm dependencies from packages.json or npm reqs.yml blocks")
+    npmPtr := flag.Bool("npm", false, "install npm dependencies from packages.json or npm reqs.yml blocks")
+    sudoNpmPtr := flag.Bool("snpm", false, "install npm dependencies with sudo")
     flag.Parse()
 
     if *withVersionPtr {
@@ -42,6 +43,9 @@ func main() {
 
     if *sudoPipPtr {
         *pipPtr = "pip"
+    }
+    if *sudoNpmPtr {
+        *npmPtr = true
     }
 
     rp := reqs.RequirementsParser{
@@ -65,10 +69,10 @@ func main() {
     if *pipPtr != "" {
         pipRequirements = rp.ParsePip()
     }
-    // npmRequirements := ""
-    // if *npmPtr {
-    //     npmRequirements = rp.ParseNpm()
-    // }
+    npmRequirements := ""
+    if *npmPtr {
+        npmRequirements = rp.ParseNpm()
+    }
 
     pc := reqs.PackageConfig{
         Tool:    packageTool,
@@ -89,7 +93,9 @@ func main() {
     if *pipPtr != "" {
         reqs.PipInstall(pipRequirements, *pipPtr, *sudoPipPtr, *upgradePtr, *quietPtr)
     }
-    // if *npmPtr {
-    //     reqs.NpmInstall(npmRequirements)
-    // }
+    if *npmPtr {
+        globalArg := true
+        fromDirectory := ""
+        reqs.NpmInstall(npmRequirements, fromDirectory, *sudoNpmPtr, globalArg, *quietPtr)
+    }
 }

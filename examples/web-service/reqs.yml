@@ -4,3 +4,6 @@ brew:
   - node
 dnf:
   - nodejs
+npm:
+  - npm
+  - bower

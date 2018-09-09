@@ -168,6 +168,44 @@ func getPipRequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs strin
 	return reqs
 }
 
+func getNpmRequirements(dirPath string, recurse bool) (text string) {
+	const reqsYml = "reqs.yml"
+	const npmRequirements = "npm-requirements.txt"
+	// const packagesJson = "packages.json"
+	fileNames := getRequirementFilenames(dirPath, recurse)
+	// TODO:
+	// npmMap := make(map[string]string)
+	// dir: packages
+	// if just dir: "" then just run npm install there for the packages.json
+	// if global: packages then install as global
+	for _, fname := range fileNames {
+		if strings.HasSuffix(fname, npmRequirements) {
+			log.Info("Found " + fname)
+			b, err := ioutil.ReadFile(fname)
+			FatalCheck(err)
+			text = AppendNewLinesOnly(text, string(b))
+		} else if strings.Contains(fname, reqsYml) {
+			log.Info("Found " + fname)
+			conf := ymlToMap(fname)
+			for tool, packages := range conf {
+				if tool == "npm" {
+					for _, p := range packages {
+						text = AppendNewLinesOnly(text, string(p))
+					}
+				}
+			}
+		}
+	}
+	return strings.TrimSpace(strings.Replace(text, "\n", " ", -1))
+}
+
+func getNpmRequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs string) {
+	for _, dirPath := range dirPaths {
+		reqs = NewLineIfNotEmpty(reqs, getNpmRequirements(dirPath, recurse))
+	}
+	return reqs
+}
+
 func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) (reqs string) {
 	for _, dirPath := range dirPaths {
 		reqs = NewLineIfNotEmpty(reqs, getSysRequirements(dirPath, packageTool, recurse))
@@ -320,7 +358,6 @@ func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
 }
 
 func (rp RequirementsParser) ParsePip() (reqs string) {
-
 	if rp.Dir != "" {
 		// search directory for requirements
 		if strings.Contains(rp.Dir, ",") {
@@ -336,6 +373,26 @@ func (rp RequirementsParser) ParsePip() (reqs string) {
 	} else {
 		// parse the current directory
 		reqs = getPipRequirements(".", rp.Recurse)
+	}
+	return reqs
+}
+
+func (rp RequirementsParser) ParseNpm() (reqs string) {
+	if rp.Dir != "" {
+		// search directory for requirements
+		if strings.Contains(rp.Dir, ",") {
+			reqs = getNpmRequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
+		} else {
+			reqs = getNpmRequirements(rp.Dir, rp.Recurse)
+		}
+	} else if rp.File != "" {
+		// read specified file for requirements
+		b, err := ioutil.ReadFile(rp.File)
+		FatalCheck(err)
+		reqs = string(b)
+	} else {
+		// parse the current directory
+		reqs = getNpmRequirements(".", rp.Recurse)
 	}
 	return reqs
 }
