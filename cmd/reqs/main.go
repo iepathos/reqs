@@ -88,7 +88,7 @@ func main() {
     if *upgradePtr {
         pc.Upgrade()
     }
-    // pc.Install()
+    pc.Install()
 
     if *pipPtr != "" {
         reqs.PipInstall(pipRequirements, *pipPtr, *sudoPipPtr, *upgradePtr, *quietPtr)
