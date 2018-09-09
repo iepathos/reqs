@@ -176,7 +176,7 @@ func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recur
 }
 
 func aptListInstalled(withVersion bool) (reqs string) {
-	out, err := exec.Command("sudo", "apt", "list", "--installed").Output()
+	out, err := exec.Command("apt", "list", "--installed").Output()
 	FatalCheck(err)
 	for _, line := range strings.Split(string(out), "\n") {
 		if strings.Contains(line, "/") {
@@ -199,18 +199,16 @@ func brewListInstalled() string {
 }
 
 func dnfListInstalled(withVersion bool) (reqs string) {
-	out, err := exec.Command("sudo", "dnf", "list", "installed").Output()
+	out, err := exec.Command("dnf", "list", "installed").Output()
 	FatalCheck(err)
-	for _, line := range strings.Split(string(out), "\n") {
-		if strings.Contains(line, "@System") {
-			lSplit := strings.Split(string(line), " ")
-			req := lSplit[0]
-			if withVersion {
-				version := strings.Split(lSplit[1], " ")[0]
-				req = req + "=" + version
-			}
-			reqs = NewLineIfNotEmpty(reqs, req)
+	for _, line := range strings.Split(string(out), "\n")[1:] {
+		lSplit := strings.Split(string(line), " ")
+		req := lSplit[0]
+		if withVersion {
+			version := strings.Split(lSplit[1], " ")[0]
+			req = req + "=" + version
 		}
+		reqs = NewLineIfNotEmpty(reqs, req)
 	}
 	return reqs
 }
