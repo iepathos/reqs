@@ -7,4 +7,3 @@ dnf:
 pip:
   - numpy
   - scipy
-
