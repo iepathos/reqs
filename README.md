@@ -109,11 +109,6 @@ force reinstall of packages
 reqs -force
 ```
 
-install pip dependencies from any found 'requirements.txt' files after system dependencies. Must specify path to the pip executable to use.  Can also specify pip requirements inside of reqs.yml under a pip section.
-```
-reqs -pip $(which pip)
-``
-
 ## Building
 
 Must have Go installed.  Recent version is better.  Relies on go-dep and go-releaser.  Build script will attempt to install/update both and whatever other deps reqs has using dep.
@@ -122,10 +117,8 @@ Must have Go installed.  Recent version is better.  Relies on go-dep and go-rele
 ./build.sh
 ```
 
-## Note
-This is a little passion side project for me.  My goal is to have beautiful code here even if this project isn't used widely.  If you have an idea you want implemented with this tool let me know about it. I will review and accept pull requests.  I open sourced this project so feel free to hack it up however you see fit.
-
 ## Todo
 
++ refactor reqs code until it's beautiful
 + test dnf compatibility for fedora setups
-+ add gem, npm, and bower comprehension or just stick to system packages?
++ add pip, gem, npm, and bower comprehension or just stick to system packages?
