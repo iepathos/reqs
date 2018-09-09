@@ -1,5 +1,5 @@
 apt:
-  - python-pip python-dev
+  - python-pip python-dev libblas-dev liblapack-dev gfortran
 brew:
   - python
 dnf:
