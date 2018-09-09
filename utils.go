@@ -2,6 +2,7 @@ package reqs
 
 import (
 	log "github.com/sirupsen/logrus"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -14,6 +15,9 @@ func FatalCheck(err error) {
 
 func IsCommandAvailable(name string) bool {
 	cmd := exec.Command("/bin/sh", "-c", "command -v "+name)
+	cmd.Env = []string{
+		"PATH=" + os.ExpandEnv("$PATH"),
+	}
 	if err := cmd.Run(); err != nil {
 		return false
 	}
