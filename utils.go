@@ -47,10 +47,10 @@ func StringContainedInSlice(s string, arr []string) bool {
 	return false
 }
 
-func AppendNewLinesOnly(text, newText string) string {
+func AppendNewLinesOnly(text, newText string) (returnText string) {
 	textSplit := strings.Split(text, "\n")
 	newTextSplit := strings.Split(newText, "\n")
-	returnText := text
+	returnText = text
 	for _, line := range newTextSplit {
 		if !StringInSlice(line, textSplit) {
 			returnText += "\n" + line
