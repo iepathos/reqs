@@ -4,17 +4,56 @@ import (
 	"bytes"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"os"
 	"os/exec"
+	// "strings"
 )
 
 // responsible for interfacing with package tools
-// deals with apt, brew, and dnf
+// deals with apt, brew, and dnf, pip
 
 func runShell(code string) {
 	log.Info(code)
 	cmd := exec.Command("/bin/sh", "-c", code)
 	err := cmd.Run()
 	FatalCheck(err)
+}
+
+// pip install given requirements, optionally --upgrade as well
+func PipInstall(requirements string, sudo, upgrade, quiet bool) {
+	log.Info("Installing pip requirements to currently active environment")
+	sudoArg := ""
+	if sudo {
+		sudoArg = "sudo "
+	}
+	upgradeArg := ""
+	if upgrade {
+		upgradeArg = "--upgrade "
+	}
+	cmdStr := sudoArg + "pip " + "install " + upgradeArg + requirements
+	if !quiet {
+		log.Info(cmdStr)
+	}
+	cmd := exec.Command("/bin/sh", "-c", cmdStr)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	cmd.Env = []string{
+		"PATH=" + os.ExpandEnv("$PATH"),
+		"PYTHONPATH=" + os.ExpandEnv("$PYTHONPATH"),
+		"PYENV_VIRTUAL_ENV=" + os.ExpandEnv("$PYENV_VIRTUAL_ENV"),
+		"PYENV_VERSION=" + os.ExpandEnv("$PYENV_VERSION"),
+	}
+	// log.Info(cmd.Env)
+	err := cmd.Run()
+	if !quiet {
+		fmt.Print(string(out.String()))
+	}
+	if err != nil {
+		// log.Fatal(err)
+		log.Fatal(stderr.String())
+	}
 }
 
 type PackageConfig struct {

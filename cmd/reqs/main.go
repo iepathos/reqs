@@ -22,6 +22,7 @@ func main() {
     forcePtr := flag.Bool("force", false, "force reinstall packages")
     upgradePtr := flag.Bool("up", false, "update and upgrade packages before install")
     sourcesPtr := flag.Bool("so", false, "stdout package tool sources")
+    pipPtr := flag.Bool("pip", false, "install pip dependencies from any 'requirements.txt' found")
     flag.Parse()
 
     if *withVersionPtr {
@@ -47,6 +48,11 @@ func main() {
 
     sudo, packageTool, autoYes, requirements := rp.Parse()
 
+    pipRequirements := ""
+    if *pipPtr {
+        pipRequirements = rp.ParsePip()
+    }
+
     pc := reqs.PackageConfig{
         Tool:    packageTool,
         Sudo:    sudo,
@@ -62,4 +68,9 @@ func main() {
         pc.Upgrade()
     }
     pc.Install()
+
+    // log.Info(pipRequirements)
+    if *pipPtr {
+        reqs.PipInstall(pipRequirements, false, *upgradePtr, *quietPtr)
+    }
 }

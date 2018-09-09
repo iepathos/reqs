@@ -112,6 +112,49 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
 	return strings.TrimSpace(text)
 }
 
+func getPipRequirements(dirPath string, recurse bool) (text string) {
+	const reqsYml = "reqs.yml"
+	const pipRequirements = "requirements.txt"
+	// possible variation
+	const pipRequirementsDarwin = "requirements-osx.txt"
+	fileNames := getRequirementFilenames(dirPath, recurse)
+
+	for _, fname := range fileNames {
+		if runtime.GOOS == "darwin" {
+			if strings.HasSuffix(fname, pipRequirementsDarwin) {
+				log.Info("Found " + fname)
+				b, err := ioutil.ReadFile(fname)
+				FatalCheck(err)
+				text = AppendNewLinesOnly(text, string(b))
+			}
+		}
+		if strings.HasSuffix(fname, pipRequirements) && !strings.HasSuffix(fname, "-"+pipRequirements) {
+			log.Info("Found " + fname)
+			b, err := ioutil.ReadFile(fname)
+			FatalCheck(err)
+			text = AppendNewLinesOnly(text, string(b))
+		} else if strings.Contains(fname, reqsYml) {
+			log.Info("Found " + fname)
+			conf := ymlToMap(fname)
+			for tool, packages := range conf {
+				if tool == "pip" {
+					for _, p := range packages {
+						text = AppendNewLinesOnly(text, string(p))
+					}
+				}
+			}
+		}
+	}
+	return strings.TrimSpace(strings.Replace(text, "\n", " ", -1))
+}
+
+func getPipRequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs string) {
+	for _, dirPath := range dirPaths {
+		reqs = NewLineIfNotEmpty(reqs, getPipRequirements(dirPath, recurse))
+	}
+	return reqs
+}
+
 func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) (reqs string) {
 	for _, dirPath := range dirPaths {
 		reqs = NewLineIfNotEmpty(reqs, getSysRequirements(dirPath, packageTool, recurse))
@@ -179,6 +222,13 @@ func (rp RequirementsParser) ListInstalled(packageTool string) (requirements str
 	return requirements
 }
 
+func amIRoot() bool {
+	if os.Geteuid() == 0 {
+		return true
+	}
+	return false
+}
+
 // determine the package tool, sudo and autoYes based on the current system
 func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) {
 	switch runtime.GOOS {
@@ -196,7 +246,9 @@ func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) 
 				break
 			}
 		}
-		sudo = "sudo "
+		if !amIRoot() {
+			sudo = "sudo "
+		}
 		autoYes = "-y "
 	case "darwin":
 		if !rp.UseStdout {
@@ -255,4 +307,25 @@ func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
 	}
 	reqs = strings.TrimSpace(strings.Replace(reqs, "\n", " ", -1))
 	return sudo, packageTool, autoYes, reqs
+}
+
+func (rp RequirementsParser) ParsePip() (reqs string) {
+
+	if rp.Dir != "" {
+		// search directory for requirements
+		if strings.Contains(rp.Dir, ",") {
+			reqs = getPipRequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
+		} else {
+			reqs = getPipRequirements(rp.Dir, rp.Recurse)
+		}
+	} else if rp.File != "" {
+		// read specified file for requirements
+		b, err := ioutil.ReadFile(rp.File)
+		FatalCheck(err)
+		reqs = string(b)
+	} else {
+		// parse the current directory
+		reqs = getPipRequirements(".", rp.Recurse)
+	}
+	return reqs
 }
