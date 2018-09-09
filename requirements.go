@@ -205,8 +205,7 @@ func dnfListInstalled(withVersion bool) (reqs string) {
 		lSplit := strings.Split(string(line), " ")
 		req := lSplit[0]
 		if withVersion {
-			version := strings.Split(lSplit[1], " ")[0]
-			req = req + "=" + version
+			req = req + "=" + lSplit[1]
 		}
 		reqs = NewLineIfNotEmpty(reqs, req)
 	}
