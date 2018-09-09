@@ -1,6 +1,6 @@
 # reqs
 
-Reqs is a cross-platform Linux and MacOSX systems package management tool. Initial aim is to wrap apt and homebrew.  After that, aiming for dnf compatiblity for Fedora deployments.
+Reqs is a cross-platform Linux and MacOSX systems package management tool. It wraps apt, homebrew, dnf and is able to automatically which tool to use based on the system it is on and installs the appropriate dependenices from any number of requirements files or reqs.yml files.  Can automatically update and/or upgrade before installing the reqs with an arg.  Has many useful args.
 
 Best way to use reqs is with a reqs.yml file in you repositories.
 
@@ -13,6 +13,8 @@ apt:
   - golang-go
 brew:
   - go
+dnf:
+  - golang
 ```
 
 Then run `reqs` in your repos and it'll install your system-level dependencies for you.
