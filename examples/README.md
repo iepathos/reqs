@@ -1,7 +1,9 @@
 # reqs examples
 
 
-We have three projects here with different system requirements and pip dependencies.  If we want to deploy one to multiple systems, some Ubuntu, some Fedora, some MacOSX then we can use reqs to manage all their dependency installation.
+We have three projects here with different system requirements and pip dependencies.  If we want to deploy to multiple systems, some Ubuntu, some Fedora, some MacOSX then reqs is a good candidate for managing the installation of their system dependencies.
+
+reqs can recurse and accept multiple directories to check for various requirements files.  This makes it especially good at dealing with combinations of services with varied dependencies.  It'll read all the requirements files, use the appropriate tool depending on the system type it's deployed on, and run one install step removing the duplicate dependencies from the call.
 
 
 All 3 projects on a system can be installed like
