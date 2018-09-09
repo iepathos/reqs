@@ -65,7 +65,11 @@ func NpmInstall(requirements, dir string, sudo, global, quiet bool) {
 	if global {
 		log.Info("Installing npm global requirements")
 	} else {
-		log.Info("Running npm install for package.json files")
+		logDir := ""
+		if dir != "" {
+			logDir = " in " + dir
+		}
+		log.Info("Running npm install" + logDir)
 	}
 	sudoArg := ""
 	if sudo {

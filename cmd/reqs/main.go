@@ -101,6 +101,7 @@ func main() {
         // any directories with package.json in them but where
         // node_modules is not part of the path run just `npm install` inside
         packageDirs := rp.FindNpmPackageDirs()
+
         for _, pkgDir := range packageDirs {
             reqs.NpmInstall("", pkgDir, false, false, *quietPtr)
         }
