@@ -10,11 +10,11 @@ Vagrant.configure("2") do |config|
     v.cpus = 2
   end
 
-
-  config.vm.provision "shell", path: "https://raw.githubusercontent.com/iepathos/reqs/master/download.sh"
+  # config.vm.provision "file", source: "download.sh", destination: "download.sh"
   config.vm.provision "file", source: "examples/data-service", destination: "data-service"
   config.vm.provision "file", source: "examples/web-service", destination: "web-service"
   config.vm.provision "file", source: "examples/flask-service", destination: "flask-service"
+  config.vm.provision "shell", path: "download.sh"
 
   config.vm.define "ubuntu" do |ubuntu|
     ubuntu.vm.box = "ubuntu/trusty64"
