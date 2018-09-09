@@ -4,7 +4,7 @@
 We have three projects here with different system requirements and pip dependencies.  If we want to deploy one to multiple systems, some Ubuntu, some Dnf, some MacOSX then we can use reqs to manage all their dependency installation.
 
 
-All 3 projects on a system can be install liked
+All 3 projects on a system can be installed like
 ```
 reqs -r -d /path/to/one,/path/to/two,/path/to/three
 ```
