@@ -30,7 +30,12 @@ reqs automatically determines the tool to used based on the system and what is a
 
 ## Installation
 
-Download the latest release for your system from [https://github.com/iepathos/reqs/releases](https://github.com/iepathos/reqs/releases)
+Fast
+```
+bash -c "$(curl -sL https://raw.githubusercontent.com/iepathos/reqs/master/download.sh)"
+```
+
+Or download the latest release for your system from [https://github.com/iepathos/reqs/releases](https://github.com/iepathos/reqs/releases)
 
 Or install with go if you're gopher inclined
 ```
