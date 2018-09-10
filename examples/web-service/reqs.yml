@@ -1,9 +1,9 @@
 apt:
-  - nodejs npm
+  - npm
 brew:
   - node
 dnf:
-  - nodejs npm
+  - npm
 npm:
   - npm
   - bower

@@ -85,13 +85,13 @@ func NpmInstall(requirements, dir string, sudo, global, quiet bool) {
 	if dir != "" {
 		cmd.Dir = dir
 	}
+	cmd.Env = []string{
+		"PATH=" + os.ExpandEnv("$PATH"),
+	}
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
-	cmd.Env = []string{
-		"PATH=" + os.ExpandEnv("$PATH"),
-	}
 	err := cmd.Run()
 	if !quiet {
 		fmt.Print(string(out.String()))
