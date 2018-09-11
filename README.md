@@ -131,6 +131,11 @@ Must have Go installed.  Recent version is better.  Relies on go-dep and go-rele
 
 Must export GITHUB_TOKEN with permission to push to origin master for the git repo.  If you just fork off github.com/iepathos/reqs and then use a personal access github token with repo permission you should be groovy.
 
+## Testing
+
+Cross-platform tests are executed using Vagrant [https://www.vagrantup.com/](https://www.vagrantup.com/) to define and manage Ubuntu, Fedora, and OSX virtual machines and execute reqs on example projects on those systems.
+
+
 ## Todo
 
 + refactor reqs code until it's beautiful
