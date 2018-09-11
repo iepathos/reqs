@@ -49,7 +49,7 @@ func (vm VagrantSystem) Down() {
 	vm.Status = "down"
 }
 
-func (vm VagrantSystem) Run(cmdStr string) {
+func (vm VagrantSystem) Run(cmdStr string) error {
 	if vm.Status != "up" {
 		vm.Up()
 	}
@@ -59,6 +59,7 @@ func (vm VagrantSystem) Run(cmdStr string) {
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	scanner := bufio.NewScanner(cmdReader)
@@ -71,10 +72,13 @@ func (vm VagrantSystem) Run(cmdStr string) {
 	err = cmd.Start()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	err = cmd.Wait()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
+	return err
 }

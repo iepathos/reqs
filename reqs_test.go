@@ -1,27 +1,32 @@
 package reqs
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func testReqsOn(arch, reqsArgsStr string) {
+func testReqsOn(arch, reqsArgsStr string) error {
 	vm := VagrantSystem{
 		Arch:   arch,
 		Status: "down",
 	}
 	vm.Down()
-	vm.Run("reqs " + reqsArgsStr)
+	err := vm.Run("reqs " + reqsArgsStr)
 	vm.Down()
+	return err
 }
 
 func TestReqsUbuntu(t *testing.T) {
-	testReqsOn("ubuntu", "-r")
+	err := testReqsOn("ubuntu", "-r")
+	assert.Nil(t, err)
 }
 
 func TestReqsFedora(t *testing.T) {
-	testReqsOn("fedora", "-r")
+	err := testReqsOn("fedora", "-r")
+	assert.Nil(t, err)
 }
 
 func TestReqsOsx(t *testing.T) {
-	testReqsOn("osx", "-r")
+	err := testReqsOn("osx", "-r")
+	assert.Nil(t, err)
 }
