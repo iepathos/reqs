@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "examples/flask-service", destination: "flask-service"
   config.vm.provision "shell", path: "download.sh"
   config.vm.provision "shell", 
-    inline: "sudo mv reqs /usr/bin/"
+    inline: "mv reqs /usr/local/bin/"
 
   config.vm.define "ubuntu" do |ubuntu|
     ubuntu.vm.box = "ubuntu/trusty64"
