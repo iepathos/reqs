@@ -4,7 +4,7 @@ version="v0.3.3"
 arch="$(uname)"
 
 if [[ "$arch" == "Darwin" ]]; then
-	url="https://github.com/iepathos/reqs/releases/download/${version}/reqs}${version//v}_Darwin_x86_64.tar.gz"
+	url="https://github.com/iepathos/reqs/releases/download/${version}/reqs_${version//v}_Darwin_x86_64.tar.gz"
 else
 	url="https://github.com/iepathos/reqs/releases/download/${version}/reqs_${version//v}_Linux_x86_64.tar.gz"
 fi
