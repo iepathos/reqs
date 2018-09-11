@@ -11,9 +11,6 @@ type VagrantSystem struct {
 }
 
 func (vm VagrantSystem) Up() {
-	if vm.Status == "up" {
-		vm.Down()
-	}
 	cmdStr := "vagrant up " + vm.Arch
 	log.Info(cmdStr)
 	cmd := exec.Command("/bin/sh", "-c", cmdStr)
@@ -42,16 +39,14 @@ func (vm VagrantSystem) Up() {
 }
 
 func (vm VagrantSystem) Down() {
-	if vm.Status == "up" {
-		cmdStr := "vagrant destroy " + vm.Arch + " -f"
-		log.Info(cmdStr)
-		out, err := exec.Command("/bin/sh", "-c", cmdStr).Output()
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Info(string(out))
-		vm.Status = "down"
+	cmdStr := "vagrant destroy " + vm.Arch + " -f"
+	log.Info(cmdStr)
+	out, err := exec.Command("/bin/sh", "-c", cmdStr).Output()
+	if err != nil {
+		log.Fatal(err)
 	}
+	log.Info(string(out))
+	vm.Status = "down"
 }
 
 func (vm VagrantSystem) Run(cmdStr string) {

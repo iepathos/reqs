@@ -9,6 +9,7 @@ func testReqsOn(arch, reqsArgsStr string) {
 		Arch:   arch,
 		Status: "down",
 	}
+	vm.Down()
 	vm.Run("reqs " + reqsArgsStr)
 	vm.Down()
 }
