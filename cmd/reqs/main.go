@@ -26,7 +26,7 @@ func main() {
     pipPtr := flag.String("pip", "", "install pip dependencies from any 'requirements.txt' found, this arg must be given the path to the pip executable to use")
     sudoPipPtr := flag.Bool("spip", false, "install pip dependencies with sudo")
     ymlPtr := flag.Bool("yml", false, "stdout the currently installed system requirements in yml format")
-    npmPtr := flag.Bool("npm", false, "install npm dependencies from packages.json or npm reqs.yml blocks")
+    npmPtr := flag.Bool("npm", false, "install global npm dependencies reqs.yml, installs package.json files in the appropriate directories")
     sudoNpmPtr := flag.Bool("snpm", false, "install npm dependencies with sudo")
     flag.Parse()
 
