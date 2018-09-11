@@ -16,7 +16,7 @@ func TestReqsUbuntu(t *testing.T) {
 	}
 	log.Info(string(out))
 
-	cmdStr = "vagrant ssh " + system + " -c \"reqs -r\""
+	cmdStr = "vagrant ssh " + system + " -c \"reqs -r -spip -snpm\""
 	log.Info(cmdStr)
 	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
 	if err != nil {
@@ -43,7 +43,7 @@ func TestReqsFedora(t *testing.T) {
 	}
 	log.Info(string(out))
 
-	cmdStr = "vagrant ssh " + system + " -c \"reqs -r\""
+	cmdStr = "vagrant ssh " + system + " -c \"reqs -r -spip -snpm\""
 	log.Info(cmdStr)
 	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
 	if err != nil {
@@ -70,7 +70,7 @@ func TestReqsDarwin(t *testing.T) {
 	}
 	log.Info(string(out))
 
-	cmdStr = "vagrant ssh " + system + " -c \"reqs -r\""
+	cmdStr = "vagrant ssh " + system + " -c \"reqs -r -spip -npm\""
 	log.Info(cmdStr)
 	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
 	if err != nil {
