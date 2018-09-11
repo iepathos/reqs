@@ -7,13 +7,26 @@ import (
 )
 
 func TestReqsUbuntu(t *testing.T) {
-	out, err := exec.Command("/bin/sh", "-c", "vagrant up ubuntu").Output()
+	system := "ubuntu"
+	cmdStr := "vagrant up " + system
+	log.Info(cmdStr)
+	out, err := exec.Command("/bin/sh", "-c", cmdStr).Output()
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Info(string(out))
 
-	out, err := exec.Command("/bin/sh", "-c", "vagrant destroy ubuntu -f").Output()
+	cmdStr = "vagrant ssh " + system + " -c \"reqs -r\""
+	log.Info(cmdStr)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Info(string(out))
+
+	cmdStr = "vagrant destroy " + system + " -f"
+	log.Info(cmdStr)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,13 +34,53 @@ func TestReqsUbuntu(t *testing.T) {
 }
 
 func TestReqsFedora(t *testing.T) {
-	out, err := exec.Command("/bin/sh", "-c", "vagrant up fedora").Output()
+	system := "fedora"
+	cmdStr := "vagrant up " + system
+	log.Info(cmdStr)
+	out, err := exec.Command("/bin/sh", "-c", cmdStr).Output()
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Info(string(out))
 
-	out, err := exec.Command("/bin/sh", "-c", "vagrant destroy fedora -f").Output()
+	cmdStr = "vagrant ssh " + system + " -c \"reqs -r\""
+	log.Info(cmdStr)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Info(string(out))
+
+	cmdStr = "vagrant destroy " + system + " -f"
+	log.Info(cmdStr)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Info(string(out))
+}
+
+func TestReqsDarwin(t *testing.T) {
+	system := "osx"
+	cmdStr := "vagrant up " + system
+	log.Info(cmdStr)
+	out, err := exec.Command("/bin/sh", "-c", cmdStr).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Info(string(out))
+
+	cmdStr = "vagrant ssh " + system + " -c \"reqs -r\""
+	log.Info(cmdStr)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Info(string(out))
+
+	cmdStr = "vagrant destroy " + system + " -f"
+	log.Info(cmdStr)
+	out, err = exec.Command("/bin/sh", "-c", cmdStr).Output()
 	if err != nil {
 		log.Fatal(err)
 	}
