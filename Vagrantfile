@@ -29,4 +29,9 @@ Vagrant.configure("2") do |config|
     osx.vm.box = "AndrewDryga/vagrant-box-osx"
   end
 
+  config.vm.define "arch" do |arch|
+    # arch.vm.box = "archlinux/archlinux"
+    arch.vm.box = "mloskot/manjaro-i3-17.0-minimal"
+  end
+
 end
