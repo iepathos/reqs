@@ -24,7 +24,9 @@ func main() {
     upgradePtr := flag.Bool("up", false, "update and upgrade packages before install")
     sourcesPtr := flag.Bool("so", false, "stdout package tool sources")
     pipPtr := flag.String("pip", "", "install pip dependencies from any 'requirements.txt' found, this arg must be given the path to the pip executable to use")
+    pip3Ptr := flag.String("pip3", "", "install pip3 dependencies from any 'requirements.txt' found and any pip3 entries in reqs.yml")
     sudoPipPtr := flag.Bool("spip", false, "install pip dependencies with sudo")
+    sudoPip3Ptr := flag.Bool("spip3", false, "install pip3 dependencies with sudo")
     ymlPtr := flag.Bool("yml", false, "stdout the currently installed system requirements in yml format")
     npmPtr := flag.Bool("npm", false, "install global npm dependencies reqs.yml, installs package.json files in the appropriate directories")
     sudoNpmPtr := flag.Bool("snpm", false, "install npm dependencies with sudo")
@@ -41,8 +43,11 @@ func main() {
         log.SetLevel(log.ErrorLevel)
     }
 
-    if *sudoPipPtr {
+    if *sudoPipPtr && *pipPtr == "" {
         *pipPtr = "pip"
+    }
+    if *sudoPip3Ptr && *pip3Ptr == "" {
+        *pip3Ptr = "pip3"
     }
     if *sudoNpmPtr {
         *npmPtr = true
@@ -69,6 +74,10 @@ func main() {
     if *pipPtr != "" {
         pipRequirements = rp.ParsePip()
     }
+    pip3Requirements := ""
+    if *pip3Ptr != "" {
+        pip3Requirements = rp.ParsePip3()
+    }
     npmRequirements := ""
     if *npmPtr {
         npmRequirements = rp.ParseNpm()
@@ -92,6 +101,9 @@ func main() {
 
     if *pipPtr != "" {
         reqs.PipInstall(pipRequirements, *pipPtr, *sudoPipPtr, *upgradePtr, *quietPtr)
+    }
+    if *pip3Ptr != "" {
+        reqs.Pip3Install(pip3Requirements, *pip3Ptr, *sudoPip3Ptr, *upgradePtr, *quietPtr)
     }
     if *npmPtr {
         globalArg := true
