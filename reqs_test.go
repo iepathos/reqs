@@ -16,29 +16,33 @@ func testReqsOn(arch, reqsArgsStr string) error {
 	return err
 }
 
-func TestReqsUbuntu(t *testing.T) {
+func TestReqsApt(t *testing.T) {
 	err := testReqsOn("ubuntu", "-r")
 	assert.Nil(t, err)
+}
 
-	// test with update and upgrade
-	err = testReqsOn("ubuntu", "-r -up")
+func TestReqsUbuntuPip3(t *testing.T) {
+	// test with pip and pip3 update and upgrade
+	err := testReqsOn("ubuntu", "-d pip3-setup -up -spip3")
 	assert.Nil(t, err)
 }
 
-func TestReqsFedora(t *testing.T) {
+func TestReqsUbuntuNpm(t *testing.T) {
+	err := testReqsOn("ubuntu", "-d web-service -snpm")
+	assert.Nil(t, err)
+}
+
+func TestReqsDnf(t *testing.T) {
 	err := testReqsOn("fedora", "-r")
 	assert.Nil(t, err)
+}
 
-	// test with update and upgrade
-	err = testReqsOn("fedora", "-r -up")
+func TestReqsBrew(t *testing.T) {
+	err := testReqsOn("osx", "-r")
 	assert.Nil(t, err)
 }
 
-func TestReqsOsx(t *testing.T) {
-	err := testReqsOn("osx", "-r")
-	assert.Nil(t, err)
-
-	// test with update and upgrade
-	err = testReqsOn("osx", "-r -up")
+func TestReqsOsxNpm(t *testing.T) {
+	err := testReqsOn("osx", "-d web-service -npm")
 	assert.Nil(t, err)
 }
