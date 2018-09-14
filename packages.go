@@ -129,7 +129,9 @@ func (pc PackageConfig) Install(upgrade bool) {
 	}
 	upgradeArg := ""
 	if upgrade {
-		upgradeArg = "--upgrade "
+		if pc.Tool == "apt" {
+			upgradeArg = "--upgrade "
+		}
 	}
 	cmdStr := envArg + pc.Sudo + pc.Tool + " install " + pc.AutoYes + forceArg + upgradeArg + pc.Reqs
 	log.Info(cmdStr)
