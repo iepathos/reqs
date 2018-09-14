@@ -120,7 +120,7 @@ func (pc PackageConfig) getForceArg() (forceArg string) {
 	return forceArg
 }
 
-func (pc PackageConfig) Install(update, upgrade bool) {
+func (pc PackageConfig) Install(upgrade bool) {
 	log.Info("Installing system requirements with " + pc.Tool)
 	forceArg := pc.getForceArg()
 	envArg := ""
