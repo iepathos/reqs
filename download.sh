@@ -1,6 +1,6 @@
 #!/bin/bash
 # downloads reqs from github release binary
-version="v0.3.7"
+version="v0.3.8"
 arch="$(uname)"
 
 if [[ "$arch" == "Darwin" ]]; then
