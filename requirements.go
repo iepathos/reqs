@@ -236,11 +236,6 @@ func getNpmRequirements(dir string, recurse bool) (text string) {
 	const reqsYml = "reqs.yml"
 	const npmRequirements = "npm-requirements.txt"
 	fileNames := getRequirementFilenames(dir, recurse)
-	// TODO:
-	// npmMap := make(map[string]string)
-	// dir: packages
-	// if just dir: "" then just run npm install there for the packages.json
-	// if global: packages then install as global
 	for _, fname := range fileNames {
 		if strings.HasSuffix(fname, npmRequirements) {
 			log.Info("Found " + fname)
