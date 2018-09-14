@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "examples/data-service", destination: "data-service"
   config.vm.provision "file", source: "examples/web-service", destination: "web-service"
   config.vm.provision "file", source: "examples/flask-service", destination: "flask-service"
+  config.vm.provision "file", source: "examples/pip3-setup", destination: "pip3-setup"
   config.vm.provision "shell", path: "download.sh"
   config.vm.provision "shell", 
     inline: "mv reqs /usr/local/bin/"
