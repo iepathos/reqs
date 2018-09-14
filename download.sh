@@ -10,5 +10,5 @@ else
 fi
 echo $url
 curl -sL $url > reqs.tar.gz
-tar -xzf reqs.tar.gz
+tar -xzf reqs.tar.gz reqs
 rm reqs.tar.gz
