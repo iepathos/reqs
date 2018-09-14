@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
     inline: "mv reqs /usr/local/bin/"
 
   config.vm.define "ubuntu" do |ubuntu|
-    ubuntu.vm.box = "ubuntu/trusty64"
+    ubuntu.vm.box = "ubuntu/xenial64"
   end
 
   config.vm.define "fedora" do |fedora|
