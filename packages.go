@@ -21,45 +21,7 @@ func runShell(code string) {
 
 // pip install given requirements, optionally --upgrade as well
 func PipInstall(requirements, pipPath string, sudo, upgrade, quiet bool) {
-	log.Info("Installing pip requirements to currently active environment")
-	sudoArg := ""
-	if sudo {
-		sudoArg = "sudo "
-	}
-	upgradeArg := ""
-	if upgrade {
-		upgradeArg = "--upgrade "
-	}
-	quietArg := ""
-	if quiet {
-		quietArg = "-q "
-	}
-	cmdStr := sudoArg + pipPath + " install " + upgradeArg + quietArg + requirements
-	if !quiet {
-		log.Info(cmdStr)
-	}
-	cmd := exec.Command("/bin/sh", "-c", cmdStr)
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	cmd.Env = []string{
-		"PATH=" + os.ExpandEnv("$PATH"),
-		"PYTHONPATH=" + os.ExpandEnv("$PYTHONPATH"),
-		"PYENV_VIRTUAL_ENV=" + os.ExpandEnv("$PYENV_VIRTUAL_ENV"),
-		"PYENV_VERSION=" + os.ExpandEnv("$PYENV_VERSION"),
-	}
-	err := cmd.Run()
-	if !quiet {
-		fmt.Print(string(out.String()))
-	}
-	if err != nil {
-		log.Fatal(stderr.String())
-	}
-}
-
-func Pip3Install(requirements, pipPath string, sudo, upgrade, quiet bool) {
-	log.Info("Installing pip requirements to currently active environment")
+	log.Info("Installing " + pipPath + " requirements to currently active environment")
 	sudoArg := ""
 	if sudo {
 		sudoArg = "sudo "
@@ -158,14 +120,18 @@ func (pc PackageConfig) getForceArg() (forceArg string) {
 	return forceArg
 }
 
-func (pc PackageConfig) Install() {
+func (pc PackageConfig) Install(update, upgrade bool) {
 	log.Info("Installing system requirements with " + pc.Tool)
 	forceArg := pc.getForceArg()
 	envArg := ""
 	if pc.Tool == "brew" {
 		envArg += "HOMEBREW_NO_AUTO_UPDATE=1 "
 	}
-	cmdStr := envArg + pc.Sudo + pc.Tool + " install " + pc.AutoYes + forceArg + pc.Reqs
+	upgradeArg := ""
+	if upgrade {
+		upgradeArg = "--upgrade "
+	}
+	cmdStr := envArg + pc.Sudo + pc.Tool + " install " + pc.AutoYes + forceArg + upgradeArg + pc.Reqs
 	log.Info(cmdStr)
 	cmd := exec.Command("/bin/sh", "-c", cmdStr)
 	var out bytes.Buffer

@@ -97,13 +97,13 @@ func main() {
     if *upgradePtr {
         pc.Upgrade()
     }
-    pc.Install()
+    pc.Install(*updatePtr, *upgradePtr)
 
     if *pipPtr != "" {
         reqs.PipInstall(pipRequirements, *pipPtr, *sudoPipPtr, *upgradePtr, *quietPtr)
     }
     if *pip3Ptr != "" {
-        reqs.Pip3Install(pip3Requirements, *pip3Ptr, *sudoPip3Ptr, *upgradePtr, *quietPtr)
+        reqs.PipInstall(pip3Requirements, *pip3Ptr, *sudoPip3Ptr, *upgradePtr, *quietPtr)
     }
     if *npmPtr {
         globalArg := true
