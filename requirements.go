@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
-	"os/exec"
+	// "os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -15,37 +15,6 @@ import (
 
 // requirements for parsing requirements files
 // and for determining currently installed requirements
-
-func installHomebrew() {
-	log.Info("Installing homebrew")
-	cmd := exec.Command("/usr/bin/ruby",
-		"-e",
-		"\"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"")
-	err := cmd.Run()
-	FatalCheck(err)
-}
-
-func getAptSources() (out string) {
-	b, err := ioutil.ReadFile("/etc/apt/sources.list")
-	FatalCheck(err)
-	// clean empty lines and comments out
-	for _, line := range strings.Split(string(b), "\n") {
-		if !strings.HasPrefix(line, "#") && strings.TrimSpace(line) != "" {
-			if out == "" {
-				out = strings.TrimSpace(line)
-			} else {
-				out += "\n" + strings.TrimSpace(line)
-			}
-		}
-	}
-	return out
-}
-
-func getBrewTaps() string {
-	out, err := exec.Command("brew", "tap").Output()
-	FatalCheck(err)
-	return strings.TrimSpace(string(out))
-}
 
 func recurseForFiles(dir string, fnames []string) (filePaths []string) {
 	filepathList := []string{}
@@ -132,43 +101,6 @@ func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recur
 	return reqs
 }
 
-func aptListInstalled(withVersion bool) (reqs string) {
-	out, err := exec.Command("apt", "list", "--installed").Output()
-	FatalCheck(err)
-	for _, line := range strings.Split(string(out), "\n") {
-		if strings.Contains(line, "/") {
-			lSplit := strings.Split(string(line), "/")
-			req := lSplit[0]
-			if withVersion {
-				version := strings.Split(lSplit[1], " ")[1]
-				req = req + "=" + version
-			}
-			reqs = NewLineIfNotEmpty(reqs, req)
-		}
-	}
-	return strings.TrimSpace(reqs)
-}
-
-func brewListInstalled() string {
-	out, err := exec.Command("brew", "list").Output()
-	FatalCheck(err)
-	return strings.TrimSpace(string(out))
-}
-
-func dnfListInstalled(withVersion bool) (reqs string) {
-	out, err := exec.Command("dnf", "list", "installed").Output()
-	FatalCheck(err)
-	for _, line := range strings.Split(string(out), "\n")[1:] {
-		lSplit := strings.Split(string(line), " ")
-		req := lSplit[0]
-		if withVersion {
-			req = req + "=" + lSplit[1]
-		}
-		reqs = NewLineIfNotEmpty(reqs, req)
-	}
-	return strings.TrimSpace(reqs)
-}
-
 type RequirementsParser struct {
 	Dir, File           string
 	UseStdout, UseStdin bool
@@ -189,11 +121,11 @@ func (rp RequirementsParser) FindNpmPackageDirs() (packageDirs []string) {
 func (rp RequirementsParser) ListInstalled(packageTool string) (requirements string) {
 	switch packageTool {
 	case "apt":
-		requirements = aptListInstalled(rp.WithVersion)
+		requirements = AptListInstalled(rp.WithVersion)
 	case "brew":
-		requirements = brewListInstalled()
+		requirements = BrewListInstalled()
 	case "dnf":
-		requirements = dnfListInstalled(rp.WithVersion)
+		requirements = DnfListInstalled(rp.WithVersion)
 	}
 	return requirements
 }
@@ -235,7 +167,7 @@ func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) 
 			log.Info("Darwin system detected")
 		}
 		if !IsCommandAvailable("brew") {
-			installHomebrew()
+			InstallHomebrew()
 		}
 		packageTool = "brew"
 	case "windows":
@@ -253,9 +185,9 @@ func (rp RequirementsParser) Parse() (sudo, packageTool, autoYes, reqs string) {
 	if rp.Sources {
 		switch packageTool {
 		case "apt":
-			fmt.Print(getAptSources())
+			fmt.Print(GetAptSources())
 		case "brew":
-			fmt.Print(getBrewTaps())
+			fmt.Print(GetBrewTaps())
 		}
 		os.Exit(0)
 	}
@@ -358,11 +290,11 @@ func (rp RequirementsParser) GenerateReqsYml() map[string][]string {
 	_, packageTool, _ := rp.parseTooling()
 	installed := ""
 	if packageTool == "apt" {
-		installed = aptListInstalled(rp.WithVersion)
+		installed = AptListInstalled(rp.WithVersion)
 	} else if packageTool == "brew" {
-		installed = brewListInstalled()
+		installed = BrewListInstalled()
 	} else if packageTool == "dnf" {
-		installed = dnfListInstalled(rp.WithVersion)
+		installed = DnfListInstalled(rp.WithVersion)
 	}
 
 	yml[packageTool] = strings.Split(installed, " ")
