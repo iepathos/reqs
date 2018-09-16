@@ -1,12 +1,15 @@
 package reqs
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 // responsible for interfacing with package tools
@@ -21,6 +24,9 @@ func runShell(code string) {
 
 // pip install given requirements, optionally --upgrade as well
 func PipInstall(requirements, pipPath string, sudo, upgrade, quiet bool) {
+	// because pip requirements.txt files can be more complicated than the
+	// cli accepts with args, we write out the requirements to a temporary
+	// file and then pass the file with -r to pip to read
 	log.Info("Installing " + pipPath + " requirements to currently active environment")
 	sudoArg := ""
 	if sudo {
@@ -34,10 +40,25 @@ func PipInstall(requirements, pipPath string, sudo, upgrade, quiet bool) {
 	if quiet {
 		quietArg = "-q "
 	}
-	cmdStr := sudoArg + pipPath + " install " + upgradeArg + quietArg + requirements
+
+	tmpReqsFile, err := ioutil.TempFile("/tmp", "reqs-")
+	FatalCheck(err)
+	defer os.Remove(tmpReqsFile.Name())
+
+	reqLines := strings.Split(requirements, " ")
+	w := bufio.NewWriter(tmpReqsFile)
+
+	for _, line := range reqLines {
+		_, err := w.WriteString(line + "\n")
+		FatalCheck(err)
+	}
+	w.Flush()
+
+	cmdStr := sudoArg + pipPath + " install " + upgradeArg + quietArg + "-r " + tmpReqsFile.Name()
 	if !quiet {
 		log.Info(cmdStr)
 	}
+
 	cmd := exec.Command("/bin/sh", "-c", cmdStr)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -49,7 +70,7 @@ func PipInstall(requirements, pipPath string, sudo, upgrade, quiet bool) {
 		"PYENV_VIRTUAL_ENV=" + os.ExpandEnv("$PYENV_VIRTUAL_ENV"),
 		"PYENV_VERSION=" + os.ExpandEnv("$PYENV_VERSION"),
 	}
-	err := cmd.Run()
+	err = cmd.Run()
 	if !quiet {
 		fmt.Print(string(out.String()))
 	}

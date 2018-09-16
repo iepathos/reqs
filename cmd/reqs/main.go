@@ -68,31 +68,17 @@ func main() {
         os.Exit(0)
     }
 
-    sudo, packageTool, autoYes, requirements := rp.Parse()
+    if *pipPtr == "" && !*npmPtr {
+        sudo, packageTool, autoYes, requirements := rp.Parse()
+        pc := reqs.PackageConfig{
+            Tool:    packageTool,
+            Sudo:    sudo,
+            AutoYes: autoYes,
+            Reqs:    requirements,
+            Force:   *forcePtr,
+            Quiet:   *quietPtr,
+        }
 
-    pipRequirements := ""
-    if *pipPtr != "" {
-        pipRequirements = rp.ParsePip()
-    }
-    pip3Requirements := ""
-    if *pip3Ptr != "" {
-        pip3Requirements = rp.ParsePip3()
-    }
-    npmRequirements := ""
-    if *npmPtr {
-        npmRequirements = rp.ParseNpm()
-    }
-
-    pc := reqs.PackageConfig{
-        Tool:    packageTool,
-        Sudo:    sudo,
-        AutoYes: autoYes,
-        Reqs:    requirements,
-        Force:   *forcePtr,
-        Quiet:   *quietPtr,
-    }
-
-    if *pipPtr != "" && !*npmPtr {
         if *updatePtr || *upgradePtr {
             pc.Update()
         }
@@ -102,13 +88,35 @@ func main() {
         pc.Install(*upgradePtr)
     }
 
+    pipRequirements := ""
     if *pipPtr != "" {
+        pipRequirements = rp.ParsePip()
+        if pipRequirements == "" {
+            log.Warn("No pip requirements found")
+        }
+    }
+    pip3Requirements := ""
+    if *pip3Ptr != "" {
+        pip3Requirements = rp.ParsePip3()
+        if pip3Requirements == "" {
+            log.Warn("No pip3 requirements found")
+        }
+    }
+    npmRequirements := ""
+    if *npmPtr {
+        npmRequirements = rp.ParseNpm()
+        if npmRequirements == "" {
+            log.Warn("No npm requirements found")
+        }
+    }
+
+    if pipRequirements != "" {
         reqs.PipInstall(pipRequirements, *pipPtr, *sudoPipPtr, *upgradePtr, *quietPtr)
     }
-    if *pip3Ptr != "" {
+    if pip3Requirements != "" {
         reqs.PipInstall(pip3Requirements, *pip3Ptr, *sudoPip3Ptr, *upgradePtr, *quietPtr)
     }
-    if *npmPtr {
+    if npmRequirements != "" {
         globalArg := true
         fromDirectory := ""
         // install global npm requirements

@@ -56,7 +56,9 @@ func AppendNewLinesOnly(text, newText string) (returnText string) {
 	newTextSplit := strings.Split(newText, "\n")
 	returnText = text
 	for _, line := range newTextSplit {
-		if !StringInSlice(strings.TrimSpace(line), textSplit) {
+		trimLine := strings.TrimSpace(line)
+		// ignore lines starting with # as comments
+		if !StringInSlice(trimLine, textSplit) && !strings.HasPrefix(trimLine, "#") {
 			returnText += "\n" + strings.TrimSpace(line)
 		}
 	}
