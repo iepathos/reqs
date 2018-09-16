@@ -91,13 +91,16 @@ func main() {
         Force:   *forcePtr,
         Quiet:   *quietPtr,
     }
-    if *updatePtr || *upgradePtr {
-        pc.Update()
+
+    if *pipPtr != "" && !*npmPtr {
+        if *updatePtr || *upgradePtr {
+            pc.Update()
+        }
+        if *upgradePtr {
+            pc.Upgrade()
+        }
+        pc.Install(*upgradePtr)
     }
-    if *upgradePtr {
-        pc.Upgrade()
-    }
-    pc.Install(*upgradePtr)
 
     if *pipPtr != "" {
         reqs.PipInstall(pipRequirements, *pipPtr, *sudoPipPtr, *upgradePtr, *quietPtr)
