@@ -27,8 +27,8 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "osx" do |osx|
-    # osx.vm.box = "AndrewDryga/vagrant-box-osx"
-    osx.vm.box = "monsenso/macos-10.13"
+    osx.vm.box = "AndrewDryga/vagrant-box-osx"
+    # osx.vm.box = "monsenso/macos-10.13"
   end
 
   config.vm.define "arch" do |arch|
