@@ -63,7 +63,7 @@ func recurseForFiles(dir string, fnames []string) (filePaths []string) {
 	return filePaths
 }
 
-func getRequirementFilenames(dirPath string, recurse bool) (fileNames []string) {
+func GetRequirementFilenames(dirPath string, recurse bool) (fileNames []string) {
 	requirementFilenames := []string{
 		"requirements.txt",
 		"reqs.yml",
@@ -96,7 +96,7 @@ func ymlToMap(ymlPath string) (conf map[string][]string) {
 // find tool-requirements.txt, common-requirements.txt and/or reqs.yml
 // in the specified directory, can recurse down the directory
 func getSysRequirements(dirPath, packageTool string, recurse bool) (text string) {
-	fileNames := getRequirementFilenames(dirPath, recurse)
+	fileNames := GetRequirementFilenames(dirPath, recurse)
 	toolRequirements := packageTool + "-requirements.txt"
 	const commonRequirements = "common-requirements.txt"
 	const reqsYml = "reqs.yml"
@@ -123,145 +123,6 @@ func getSysRequirements(dirPath, packageTool string, recurse bool) (text string)
 		log.Warn("No system requirements files found")
 	}
 	return strings.TrimSpace(text)
-}
-
-func getPipRequirements(dirPath string, recurse bool) (text string) {
-	const reqsYml = "reqs.yml"
-	const pipRequirements = "requirements.txt"
-	// possible variation
-	const pipRequirementsDarwin = "requirements-osx.txt"
-	fileNames := getRequirementFilenames(dirPath, recurse)
-
-	for _, fname := range fileNames {
-		if runtime.GOOS == "darwin" {
-			if strings.HasSuffix(fname, pipRequirementsDarwin) {
-				log.Info("Found " + fname)
-				b, err := ioutil.ReadFile(fname)
-				FatalCheck(err)
-				text = AppendNewLinesOnly(text, string(b))
-			}
-		}
-		if strings.HasSuffix(fname, pipRequirements) && !strings.HasSuffix(fname, "-"+pipRequirements) {
-			log.Info("Found " + fname)
-			b, err := ioutil.ReadFile(fname)
-			FatalCheck(err)
-			text = AppendNewLinesOnly(text, string(b))
-		} else if strings.Contains(fname, reqsYml) {
-			log.Info("Found " + fname)
-			conf := ymlToMap(fname)
-			for tool, packages := range conf {
-				if tool == "pip" {
-					for _, p := range packages {
-						text = AppendNewLinesOnly(text, string(p))
-					}
-				}
-			}
-		}
-	}
-	return strings.TrimSpace(strings.Replace(text, "\n", " ", -1))
-}
-
-func getPip3Requirements(dirPath string, recurse bool) (text string) {
-	const reqsYml = "reqs.yml"
-	const pipRequirements = "requirements.txt"
-	// possible variation
-	const pipRequirementsDarwin = "requirements-osx.txt"
-	fileNames := getRequirementFilenames(dirPath, recurse)
-
-	for _, fname := range fileNames {
-		if runtime.GOOS == "darwin" {
-			if strings.HasSuffix(fname, pipRequirementsDarwin) {
-				log.Info("Found " + fname)
-				b, err := ioutil.ReadFile(fname)
-				FatalCheck(err)
-				text = AppendNewLinesOnly(text, string(b))
-			}
-		}
-		if strings.HasSuffix(fname, pipRequirements) && !strings.HasSuffix(fname, "-"+pipRequirements) {
-			log.Info("Found " + fname)
-			b, err := ioutil.ReadFile(fname)
-			FatalCheck(err)
-			text = AppendNewLinesOnly(text, string(b))
-		} else if strings.Contains(fname, reqsYml) {
-			log.Info("Found " + fname)
-			conf := ymlToMap(fname)
-			for tool, packages := range conf {
-				if tool == "pip3" {
-					for _, p := range packages {
-						text = AppendNewLinesOnly(text, string(p))
-					}
-				}
-			}
-		}
-	}
-	return strings.TrimSpace(strings.Replace(text, "\n", " ", -1))
-}
-
-func getPipRequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs string) {
-	for _, dirPath := range dirPaths {
-		reqs = NewLineIfNotEmpty(reqs, getPipRequirements(dirPath, recurse))
-	}
-	return reqs
-}
-
-func getPip3RequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs string) {
-	for _, dirPath := range dirPaths {
-		reqs = NewLineIfNotEmpty(reqs, getPip3Requirements(dirPath, recurse))
-	}
-	return reqs
-}
-
-func findNpmPackageDirs(dir string, recurse bool) (packageDirs []string) {
-	const packageJson = "package.json"
-	if recurse {
-		err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
-			if strings.Contains(path, packageJson) && !strings.Contains(path, "node_modules") && !strings.Contains(path, "bower_components") {
-				d, _ := filepath.Split(path)
-				log.Info("Found npm package directory " + d)
-				packageDirs = append(packageDirs, d)
-			}
-			return nil
-		})
-		FatalCheck(err)
-	} else {
-		if _, err := os.Stat(dir + "/" + packageJson); !os.IsNotExist(err) {
-			log.Info("Found npm package directory " + dir)
-			packageDirs = append(packageDirs, dir)
-		}
-	}
-	return packageDirs
-}
-
-func getNpmRequirements(dir string, recurse bool) (text string) {
-	const reqsYml = "reqs.yml"
-	const npmRequirements = "npm-requirements.txt"
-	fileNames := getRequirementFilenames(dir, recurse)
-	for _, fname := range fileNames {
-		if strings.HasSuffix(fname, npmRequirements) {
-			log.Info("Found " + fname)
-			b, err := ioutil.ReadFile(fname)
-			FatalCheck(err)
-			text = AppendNewLinesOnly(text, string(b))
-		} else if strings.Contains(fname, reqsYml) {
-			log.Info("Found " + fname)
-			conf := ymlToMap(fname)
-			for tool, packages := range conf {
-				if tool == "npm" {
-					for _, p := range packages {
-						text = AppendNewLinesOnly(text, string(p))
-					}
-				}
-			}
-		}
-	}
-	return strings.TrimSpace(strings.Replace(text, "\n", " ", -1))
-}
-
-func getNpmRequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs string) {
-	for _, dirPath := range dirPaths {
-		reqs = NewLineIfNotEmpty(reqs, getNpmRequirements(dirPath, recurse))
-	}
-	return reqs
 }
 
 func getSysRequirementsMultipleDirs(dirPaths []string, packageTool string, recurse bool) (reqs string) {
@@ -321,7 +182,7 @@ func (rp RequirementsParser) FindNpmPackageDirs() (packageDirs []string) {
 	if rp.Dir != "" {
 		dirArg = rp.Dir
 	}
-	packageDirs = findNpmPackageDirs(dirArg, rp.Recurse)
+	packageDirs = FindNpmPackageDirs(dirArg, rp.Recurse)
 	return packageDirs
 }
 
@@ -432,9 +293,9 @@ func (rp RequirementsParser) ParsePip() (reqs string) {
 	if rp.Dir != "" {
 		// search directory for requirements
 		if strings.Contains(rp.Dir, ",") {
-			reqs = getPipRequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
+			reqs = GetPipRequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
 		} else {
-			reqs = getPipRequirements(rp.Dir, rp.Recurse)
+			reqs = GetPipRequirements(rp.Dir, rp.Recurse)
 		}
 	} else if rp.File != "" {
 		// read specified file for requirements
@@ -443,7 +304,7 @@ func (rp RequirementsParser) ParsePip() (reqs string) {
 		reqs = string(b)
 	} else {
 		// parse the current directory
-		reqs = getPipRequirements(".", rp.Recurse)
+		reqs = GetPipRequirements(".", rp.Recurse)
 	}
 	return reqs
 }
@@ -452,9 +313,9 @@ func (rp RequirementsParser) ParsePip3() (reqs string) {
 	if rp.Dir != "" {
 		// search directory for requirements
 		if strings.Contains(rp.Dir, ",") {
-			reqs = getPip3RequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
+			reqs = GetPip3RequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
 		} else {
-			reqs = getPip3Requirements(rp.Dir, rp.Recurse)
+			reqs = GetPip3Requirements(rp.Dir, rp.Recurse)
 		}
 	} else if rp.File != "" {
 		// read specified file for requirements
@@ -463,7 +324,7 @@ func (rp RequirementsParser) ParsePip3() (reqs string) {
 		reqs = string(b)
 	} else {
 		// parse the current directory
-		reqs = getPip3Requirements(".", rp.Recurse)
+		reqs = GetPip3Requirements(".", rp.Recurse)
 	}
 	return reqs
 }
@@ -472,9 +333,9 @@ func (rp RequirementsParser) ParseNpm() (reqs string) {
 	if rp.Dir != "" {
 		// search directory for requirements
 		if strings.Contains(rp.Dir, ",") {
-			reqs = getNpmRequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
+			reqs = GetNpmRequirementsMultipleDirs(strings.Split(rp.Dir, ","), rp.Recurse)
 		} else {
-			reqs = getNpmRequirements(rp.Dir, rp.Recurse)
+			reqs = GetNpmRequirements(rp.Dir, rp.Recurse)
 		}
 	} else if rp.File != "" {
 		// read specified file for requirements
@@ -483,7 +344,7 @@ func (rp RequirementsParser) ParseNpm() (reqs string) {
 		reqs = string(b)
 	} else {
 		// parse the current directory
-		reqs = getNpmRequirements(".", rp.Recurse)
+		reqs = GetNpmRequirements(".", rp.Recurse)
 	}
 	return reqs
 }
