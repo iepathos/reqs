@@ -155,8 +155,7 @@ func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) 
 			}
 		}
 		if packageTool == "" {
-			log.Fatal("Failed to find any support package management tools")
-			// os.Exit(1)
+			log.Fatal("Failed to find supported package management tools")
 		}
 		if !amIRoot() {
 			sudo = "sudo "
