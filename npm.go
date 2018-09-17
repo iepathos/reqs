@@ -1,9 +1,12 @@
 package reqs
 
 import (
+	"bytes"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -59,4 +62,48 @@ func GetNpmRequirementsMultipleDirs(dirPaths []string, recurse bool) (reqs strin
 		reqs = NewLineIfNotEmpty(reqs, GetNpmRequirements(dirPath, recurse))
 	}
 	return reqs
+}
+
+func NpmInstall(requirements, dir string, sudo, global, quiet bool) {
+	if dir != "" {
+		dir, _ = filepath.Abs(dir)
+	}
+	if global {
+		log.Info("Installing npm global requirements")
+	} else {
+		logDir := ""
+		if dir != "" {
+			logDir = " in " + dir
+		}
+		log.Info("Running npm install" + logDir)
+	}
+	sudoArg := ""
+	if sudo {
+		sudoArg = "sudo "
+	}
+	globalArg := ""
+	if global {
+		globalArg = "-g "
+	}
+	cmdStr := sudoArg + "npm " + globalArg + "install " + requirements
+	log.Info(cmdStr)
+	cmd := exec.Command("/bin/sh", "-c", cmdStr)
+	if dir != "" {
+		cmd.Dir = dir
+	}
+	cmd.Env = []string{
+		"PATH=" + os.ExpandEnv("$PATH"),
+	}
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if !quiet {
+		fmt.Print(string(out.String()))
+	}
+	if err != nil {
+		log.Fatal(err)
+		log.Fatal(stderr.String())
+	}
 }

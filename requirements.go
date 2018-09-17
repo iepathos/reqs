@@ -7,7 +7,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
-	// "os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
