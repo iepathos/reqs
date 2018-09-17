@@ -1,8 +1,8 @@
 # reqs
 
-Reqs is a cross-platform Linux and MacOSX systems package management tool. It wraps apt, homebrew, dnf and is able to automatically determine the right tool to use based on the system.  It checks requirements files and/or reqs.yml files.  
+Reqs is a cross-platform Linux and MacOSX systems package management tool.  It wraps apt, homebrew, dnf, yum, pip, npm and is able to automatically determine the right tool to use based on the system.  It checks requirements files and/or reqs.yml files.  Allows projects to clearly define their system package requirements and install them intelligently across multiple repositories and files.
 
-The main focus of reqs is system package management abstraction with pip and possibly gem support added as an after thought to ease some project deployments.  Because pip and ruby reqs generally don't differ from system-to-system abstracting those tools is not so important to reqs.
+The main focus of reqs is system package management abstraction with pip and possibly gem support added as an after thought to ease some project deployments.  Because pip and ruby reqs generally don't differ from system-to-system abstracting those tools is not so important to reqs.  If pip or npm arguments are specified the system package installation will be skipped, this functionality may change in the future.
 
 Best way to use reqs is with a reqs.yml file in you repositories.
 
