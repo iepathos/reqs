@@ -1,5 +1,12 @@
-common:
+apt:
   - python3
   - python3-pip
+dnf:
+  - python3
+  - python3-pip
+brew:
+  - python3
+yum:
+  - rh-python36
 pip3:
   - pywal
