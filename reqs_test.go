@@ -63,3 +63,9 @@ func TestReqsOsxNpm(t *testing.T) {
 // 	err := testReqsOn("osx", "-d pip3-service -pip3")
 // 	assert.Nil(t, err)
 // }
+
+// test basic yum
+func TestReqsYum(t *testing.T) {
+	err := testReqsOn("centos", "-r")
+	assert.Nil(t, err)
+}

@@ -146,6 +146,7 @@ func (rp RequirementsParser) parseTooling() (sudo, packageTool, autoYes string) 
 		linuxTools := []string{
 			"apt",
 			"dnf",
+			"yum",
 		}
 		for _, tool := range linuxTools {
 			if IsCommandAvailable(tool) {
