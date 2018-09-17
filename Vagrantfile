@@ -36,4 +36,8 @@ Vagrant.configure("2") do |config|
     arch.vm.box = "mloskot/manjaro-i3-17.0-minimal"
   end
 
+  config.vm.define "centos" do |centos|
+    centos.vm.box = "centos/7"
+  end
+
 end
