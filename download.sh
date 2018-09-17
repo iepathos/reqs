@@ -1,6 +1,12 @@
 #!/bin/bash
 # downloads reqs from github release binary
-version="v0.4.0"
+# can pass version as argument to download script
+# to get a particular, should get the latest by default
+if [[ -z "$1" ]]; then
+	version="v0.4.0"
+else
+	version="$1"
+fi
 arch="$(uname)"
 
 if [[ "$arch" == "Darwin" ]]; then
