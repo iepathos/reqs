@@ -55,7 +55,12 @@ view reqs args and their descriptions
 reqs -h
 ```
 
-install all of the example projects with system pip and system npm
+recurse down directories to find requirements files and install the system depdencies
+```
+reqs -r
+```
+
+install all of the example projects' system pip and system npm dependenices
 ```
 reqs -r -d examples -spip -snpm
 ```
@@ -63,11 +68,6 @@ reqs -r -d examples -spip -snpm
 install requirements in the current directory
 ```
 reqs
-```
-
-recurse down directories to find requirements files
-```
-reqs -r
 ```
 
 get requirements from a specific directory, automaticaly detect appropriate <system-tool>-requirements.txt to use
